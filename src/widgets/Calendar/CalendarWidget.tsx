@@ -1,5 +1,5 @@
 import { useWeekNavigation } from '../../features/Calendar/model/useWeekNavigation.ts'
-import { WeekGrid } from './ui/WeekGrid'
+import { WeekGrid } from './ui/WeekGrid.tsx'
 
 export function CalendarWidget() {
     const { weekStart, goNext, goPrev, goToToday } =

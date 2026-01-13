@@ -1,0 +1,23 @@
+.current-time {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.current-time__line {
+    height: 2px;
+    background: #ea4335;
+    margin-left: 48px;
+}
+
+.current-time__dot {
+    position: absolute;
+    left: 40px;
+    top: -5px;
+    width: 10px;
+    height: 10px;
+    background: #ea4335;
+    border-radius: 50%;
+}

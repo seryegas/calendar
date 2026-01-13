@@ -1,0 +1,59 @@
+.week {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: system-ui, sans-serif;
+}
+
+/* ===== HEADER ===== */
+
+.week-header {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.time-col {
+    background: #fff;
+}
+
+/* ===== BODY ===== */
+
+.week-body {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    flex: 1;
+    overflow: hidden;
+}
+
+.week-body > .time-col {
+    overflow-y: auto;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    overflow-y: auto;
+}
+
+/* ===== HOURS ===== */
+
+.hour-label {
+    height: 60px;
+    font-size: 12px;
+    padding-right: 4px;
+    text-align: right;
+    box-sizing: border-box;
+    color: #666;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e0e0;
+}
+
+.hour-cell {
+    height: 60px;
+    border-top: 1px solid #f0f0f0;
+}

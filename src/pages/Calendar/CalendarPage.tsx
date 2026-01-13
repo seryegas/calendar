@@ -1,4 +1,4 @@
-import { CalendarWidget } from '../../widgets/calendar/CalendarWidget.tsx'
+import { CalendarWidget } from '../../widgets/Calendar/CalendarWidget.tsx'
 
 export function CalendarPage() {
     return <CalendarWidget />
