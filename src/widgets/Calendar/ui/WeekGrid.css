@@ -17,34 +17,40 @@
     background: #fff;
 }
 
-/* ===== BODY ===== */
-
 .week-body {
     display: grid;
     grid-template-columns: 60px 1fr;
     flex: 1;
     overflow: hidden;
+    position: relative;
+    align-items: start;
 }
 
-.week-body > .time-col {
+.week-scroll {
+    flex: 1;
     overflow-y: auto;
 }
 
 .days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    overflow-y: auto;
+    overflow: visible;
 }
 
-/* ===== HOURS ===== */
+.hour-label-empty {
+    height: 54px;
+}
 
 .hour-label {
-    height: 60px;
+    height: 61px;
     font-size: 12px;
-    padding-right: 4px;
-    text-align: right;
-    box-sizing: border-box;
     color: #666;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-right: 6px;
+    box-sizing: border-box;
 }
 
 .day-column {

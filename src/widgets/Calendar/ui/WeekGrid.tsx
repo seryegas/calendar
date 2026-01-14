@@ -27,9 +27,13 @@ export function WeekGrid({ weekStart }: Props) {
                     <CurrentTimeIndicator />
                     <div className="time-col">
                         {Array.from({ length: 24 }, (_, h) => (
-                            <div key={h} className="hour-label">
-                                {String(h).padStart(2, '0')}:00
-                            </div>
+                            h === 0 ? (
+                                <div key={h} className="hour-label-empty" />
+                            ) : (
+                                <div key={h} className="hour-label">
+                                    {String(h).padStart(2, '0')}:00
+                                </div>
+                            )
                         ))}
                     </div>
 
