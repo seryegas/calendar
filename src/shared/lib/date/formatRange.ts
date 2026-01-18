@@ -1,6 +1,6 @@
-export function formatWeekRange(weekStart: Date): string {
-    const start = new Date(weekStart)
-    const end = new Date(weekStart)
+export function formatRange(startDate: Date): string {
+    const start = new Date(startDate)
+    const end = new Date(startDate)
     end.setDate(start.getDate() + 6)
 
     const sameYear = start.getFullYear() === end.getFullYear()

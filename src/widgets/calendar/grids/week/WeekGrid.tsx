@@ -1,12 +1,13 @@
-import './WeekGrid.css'
-import {DayHeader} from "./DayHeader.tsx";
-import {DayColumn} from "./DayColumn.tsx";
+import '../../../calendar-week/ui/WeekGrid.css'
+import {DayHeader} from "../../../calendar-week/ui/DayHeader.tsx";
+import {DayColumn} from "../../../calendar-week/ui/DayColumn.tsx";
+import {startOfWeek} from "../../../../shared/lib/date/date.ts";
+import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
 
-type Props = {
-    weekStart: Date
-}
+export function WeekGrid() {
+    const {selectedDay} = useCalendar()
+    const weekStart = startOfWeek(selectedDay);
 
-export function WeekGrid({ weekStart }: Props) {
     const days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(weekStart)
         d.setDate(d.getDate() + i)

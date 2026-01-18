@@ -1,25 +1,26 @@
-type ViewType = 'month' | 'week' | 'day';
+import {formatRange} from "../../shared/lib/date/formatRange.ts";
+import {ViewSwitcher} from "./ui/ViewSwitcher.tsx";
+import "./ui/Header.css"
+import {useCalendar} from "../../app/providers/CalendarProvider.tsx";
+import {Navigation} from "./ui/Navigation.tsx";
 
-interface HeaderProps {
-    view: ViewType;
-    onChangeView: (view: ViewType) => void;
-    dateLabel: string;
-}
+export function Header(){
+    const { selectedDay } = useCalendar()
 
-export function Header({
-                           view,
-                           onChangeView,
-                           dateLabel,
-                       }: HeaderProps) {
+    const currentDate = formatRange(selectedDay)
+
     return (
         <header className="header">
             <div className="header-left">
                 <span className="logo">📅 Календарь</span>
             </div>
 
+            <Navigation />
+
+            <div className="current-date">{currentDate}</div>
+
             <div className="header-center">
-                <ViewSwitcher view={view} onChange={onChangeView} />
-                <span className="current-date">{dateLabel}</span>
+                <ViewSwitcher />
             </div>
 
             <div className="header-right">

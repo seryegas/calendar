@@ -1,5 +1,6 @@
-import { CalendarPage } from '../pages/Calendar/CalendarPage.tsx'
+import {CalendarPageRefactored} from "../pages/Calendar/CalendarPageRefactored.tsx";
+import {CalendarProvider} from "./providers/CalendarProvider.tsx";
 
 export default function App() {
-    return <CalendarPage />
+    return <CalendarProvider><CalendarPageRefactored/></CalendarProvider>
 }
