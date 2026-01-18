@@ -1,6 +1,6 @@
 import './WeekGrid.css'
 import {DayHeader} from "./DayHeader.tsx";
-import {CurrentTimeIndicator} from "../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
+import {DayColumn} from "./DayColumn.tsx";
 
 type Props = {
     weekStart: Date
@@ -24,7 +24,6 @@ export function WeekGrid({ weekStart }: Props) {
 
             <div className="week-scroll">
                 <div className="week-body">
-                    <CurrentTimeIndicator />
                     <div className="time-col">
                         {Array.from({ length: 24 }, (_, h) => (
                             h === 0 ? (
@@ -39,11 +38,7 @@ export function WeekGrid({ weekStart }: Props) {
 
                     <div className="days-grid">
                         {days.map(day => (
-                            <div key={day.toISOString()} className="day-column">
-                                {Array.from({ length: 24 }).map((_, h) => (
-                                    <div key={h} className="hour-cell" />
-                                ))}
-                            </div>
+                            <DayColumn key={day.toISOString()} date={day}/>
                         ))}
                     </div>
                 </div>

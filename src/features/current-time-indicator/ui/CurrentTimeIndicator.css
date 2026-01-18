@@ -7,14 +7,14 @@
 }
 
 .current-time__line {
+    margin-top: -1px;
     height: 2px;
     background: #ea4335;
-    margin-left: 48px;
 }
 
 .current-time__dot {
     position: absolute;
-    left: 40px;
+    left: -5px;
     top: -5px;
     width: 10px;
     height: 10px;
