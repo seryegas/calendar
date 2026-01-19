@@ -1,4 +1,4 @@
-import { CurrentTimeIndicator } from "../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
+import { CurrentTimeIndicator } from "../../../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
 
 type Props = {
     date: Date

@@ -1,6 +1,6 @@
-import '../../../calendar-week/ui/WeekGrid.css'
-import {DayHeader} from "../../../calendar-week/ui/DayHeader.tsx";
-import {DayColumn} from "../../../calendar-week/ui/DayColumn.tsx";
+import './ui/WeekGrid.css'
+import {DayHeader} from "./ui/DayHeader.tsx";
+import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
 

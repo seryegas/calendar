@@ -1,5 +1,9 @@
-import { CalendarWidget } from '../../widgets/calendar-week/CalendarWidget.tsx'
+import {Header} from "../../widgets/header/Header.tsx";
+import {Calendar} from "../../widgets/calendar/Calendar.tsx";
 
 export function CalendarPage() {
-    return <CalendarWidget />
+    return <div>
+        <Header />
+        <Calendar />
+    </div>;
 }
