@@ -1,10 +1,13 @@
 import { CurrentTimeIndicator } from "../../../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
+import {TimeBlockList} from "../../../../../features/TimeBlock/ui/TimeBlockList.tsx";
+import type {TimeBlock} from "../../../../../features/TimeBlock/model/types.ts";
 
 type Props = {
-    date: Date
+    date: Date,
+    blocks: TimeBlock[]
 }
 
-export function DayColumn({ date }: Props) {
+export function DayColumn({ date, blocks }: Props) {
     const now = new Date()
 
     const isToday =
@@ -15,6 +18,8 @@ export function DayColumn({ date }: Props) {
     return (
         <div className="day-column">
             {isToday && <CurrentTimeIndicator />}
+
+            <TimeBlockList blocks={blocks} />
 
             {Array.from({ length: 24 }).map((_, h) => (
                 <div key={h} className="hour-cell" />

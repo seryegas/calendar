@@ -3,6 +3,31 @@ import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
+import type {TimeBlock} from "../../../../features/TimeBlock/model/types.ts";
+
+const blocks: TimeBlock[] = [
+    {
+        id: '1',
+        title: 'Работа',
+        startAt: new Date(2026, 0, 15, 9, 0),
+        endAt: new Date(2026, 0, 15, 11, 0),
+        color: '#4285f4',
+    },
+    {
+        id: '2',
+        title: 'Созвон',
+        startAt: new Date(2026, 0, 15, 10, 0),
+        endAt: new Date(2026, 0, 15, 15, 30),
+        color: '#34a853',
+    },
+    {
+        id: '3',
+        title: 'Работfffffffа',
+        startAt: new Date(2026, 0, 15, 9, 30),
+        endAt: new Date(2026, 0, 15, 11, 0),
+        color: '#742087',
+    },
+]
 
 export function WeekGrid() {
     const {selectedDay} = useCalendar()
@@ -39,7 +64,7 @@ export function WeekGrid() {
 
                     <div className="days-grid">
                         {days.map(day => (
-                            <DayColumn key={day.toISOString()} date={day}/>
+                            <DayColumn key={day.toISOString()} date={day} blocks={blocks}/>
                         ))}
                     </div>
                 </div>

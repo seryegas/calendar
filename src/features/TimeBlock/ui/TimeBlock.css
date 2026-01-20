@@ -1,0 +1,25 @@
+.time-block {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    border-radius: 6px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    font-size: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #000;
+}
+
+.time-block__title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.time-block__description {
+    margin-top: 4px;
+    font-size: 11px;
+    opacity: 0.8;
+}
