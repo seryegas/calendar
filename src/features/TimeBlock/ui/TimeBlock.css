@@ -23,3 +23,8 @@
     font-size: 11px;
     opacity: 0.8;
 }
+
+.time-block:active {
+    cursor: grabbing;
+    z-index: 10;
+}

@@ -1,43 +1,59 @@
 import './ui/WeekGrid.css'
+import {useState} from "react";
 import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
 import type {TimeBlock} from "../../../../features/TimeBlock/model/types.ts";
-
-const blocks: TimeBlock[] = [
-    {
-        id: '1',
-        title: 'Работа',
-        startAt: new Date(2026, 0, 15, 9, 0),
-        endAt: new Date(2026, 0, 15, 11, 0),
-        color: '#4285f4',
-    },
-    {
-        id: '2',
-        title: 'Созвон',
-        startAt: new Date(2026, 0, 15, 10, 0),
-        endAt: new Date(2026, 0, 15, 15, 30),
-        color: '#34a853',
-    },
-    {
-        id: '3',
-        title: 'Работfffffffа',
-        startAt: new Date(2026, 0, 15, 9, 30),
-        endAt: new Date(2026, 0, 15, 11, 0),
-        color: '#742087',
-    },
-]
+import {getBlocksForDay} from "../../../../features/TimeBlock/model/selectors.ts";
 
 export function WeekGrid() {
     const {selectedDay} = useCalendar()
     const weekStart = startOfWeek(selectedDay);
+
+    const [blocks, setBlocks] = useState<TimeBlock[]>([
+        {
+            id: '1',
+            title: 'Работа',
+            startAt: new Date(2026, 0, 20, 9, 0),
+            endAt: new Date(2026, 0, 20, 11, 0),
+            color: '#4285f4',
+        },
+        {
+            id: '2',
+            title: 'Созвон',
+            startAt: new Date(2026, 0, 20, 10, 0),
+            endAt: new Date(2026, 0, 20, 15, 30),
+            color: '#34a853',
+        },
+        {
+            id: '3',
+            title: 'Работfffffffа',
+            startAt: new Date(2026, 0, 20, 9, 30),
+            endAt: new Date(2026, 0, 20, 11, 0),
+            color: '#742087',
+        },
+    ])
 
     const days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(weekStart)
         d.setDate(d.getDate() + i)
         return d
     })
+
+    function handleUpdateBlock(
+        id: string,
+        startAt: Date,
+        endAt: Date
+    ) {
+        setBlocks(prev =>
+            prev.map(b =>
+                b.id === id
+                    ? { ...b, startAt, endAt }
+                    : b
+            )
+        )
+    }
 
     return (
         <div className="week">
@@ -64,7 +80,12 @@ export function WeekGrid() {
 
                     <div className="days-grid">
                         {days.map(day => (
-                            <DayColumn key={day.toISOString()} date={day} blocks={blocks}/>
+                            <DayColumn
+                                key={day.toISOString()}
+                                date={day}
+                                blocks={getBlocksForDay(blocks, day)}
+                                onUpdateBlock={handleUpdateBlock}
+                            /> // отрефакторить в будущем (отфильтровать по дням блоки заранее
                         ))}
                     </div>
                 </div>

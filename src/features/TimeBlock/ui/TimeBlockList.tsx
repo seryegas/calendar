@@ -1,22 +1,38 @@
-import type { TimeBlock } from '../model/types'
-import { TimeBlock as TimeBlockItem } from './TimeBlock'
-import {calculateDayLayout} from "../lib/calculateDayLayout.ts";
+import type { PositionedTimeBlock } from '../model/types'
+import { TimeBlock } from './TimeBlock'
+import { useTimeBlockDrag } from '../model/useTimeBlockDrag'
 
 type Props = {
-    blocks: TimeBlock[]
+    blocks: PositionedTimeBlock[]
+    onChange: (
+        id: string,
+        startAt: Date,
+        endAt: Date
+    ) => void
 }
 
-export function TimeBlockList({ blocks }: Props) {
-    const positionedBlocks = calculateDayLayout(blocks)
+export function TimeBlockList({
+                                  blocks,
+                                  onChange,
+                              }: Props) {
+    const { bind } = useTimeBlockDrag({
+        onDrop: onChange,
+    })
 
     return (
         <>
-            {positionedBlocks.map(block => (
-                    <TimeBlockItem
-                        key={block.id}
-                block={block}
-    />
-))}
-    </>
-)
+            {blocks.map(block => {
+                const drag = bind(block)
+
+                block.top = drag.draggedTop
+
+                return (
+                    <TimeBlock
+                        block={block}
+                        onMouseDown={drag.onMouseDown}
+                    />
+                )
+            })}
+        </>
+    )
 }

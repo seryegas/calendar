@@ -24,3 +24,13 @@ export function blockTop(start: Date): number {
 export function blockHeight(start: Date, end: Date): number {
     return minutesFromDayStart(end) - minutesFromDayStart(start)
 }
+
+export function dateFromTop(baseDate: Date, top: number): Date {
+    const minutes = Math.round((top / PIXELS_PER_HOUR) * 60)
+
+    const d = new Date(baseDate)
+    d.setHours(0, 0, 0, 0)
+    d.setMinutes(minutes)
+
+    return d
+}

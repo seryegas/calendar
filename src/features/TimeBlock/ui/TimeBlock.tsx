@@ -1,11 +1,13 @@
 import type { PositionedTimeBlock } from '../model/types'
 import './TimeBlock.css'
+import React from "react";
 
 type Props = {
     block: PositionedTimeBlock
+    onMouseDown: (e: React.MouseEvent) => void
 }
 
-export function TimeBlock({ block }: Props) {
+export function TimeBlock({ block, onMouseDown }: Props) {
     return (
         <div
             className="time-block"
@@ -16,6 +18,7 @@ export function TimeBlock({ block }: Props) {
                 width: `${block.width}%`,
                 backgroundColor: block.color ?? '#d2e3fc',
             }}
+            onMouseDown={onMouseDown}
         >
             <div className="time-block__title">
                 {block.title}
