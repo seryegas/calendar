@@ -1,6 +1,6 @@
 import { CurrentTimeIndicator } from "../../../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
 import {TimeBlockList} from "../../../../../features/TimeBlock/ui/TimeBlockList.tsx";
-import type {TimeBlock} from "../../../../../features/TimeBlock/model/types.ts";
+import type {TimeBlock, TimeBlockInteractions} from "../../../../../features/TimeBlock/model/types.ts";
 import {calculateDayLayout} from "../../../../../features/TimeBlock/lib/calculateDayLayout.ts";
 import {dateFromTop} from "../../../../../features/TimeBlock/model/helpers.ts";
 import React from "react";
@@ -8,17 +8,10 @@ import React from "react";
 type Props = {
     date: Date,
     blocks: TimeBlock[]
-    onUpdateBlock: (
-        id: string,
-        startAt: Date,
-        endAt: Date
-    ) => void
-    onCreateBlock: (block: TimeBlock) => void
-    onUpdateTitle: (id: string, title: string) => void
-    onCancelCreate: (id: string) => void
+    interactions: TimeBlockInteractions
 }
 
-export function DayColumn({ date, blocks, onUpdateBlock, onCreateBlock, onUpdateTitle, onCancelCreate }: Props) {
+export function DayColumn({ date, blocks, interactions }: Props) {
     function handleDayClick(
         e: React.MouseEvent<HTMLDivElement>
     ) {
@@ -35,7 +28,7 @@ export function DayColumn({ date, blocks, onUpdateBlock, onCreateBlock, onUpdate
             startAt.getTime() + 60 * 60 * 1000
         )
 
-        onCreateBlock({
+        interactions.crud.create({
             id: crypto.randomUUID(),
             title: '',
             startAt,
@@ -65,9 +58,7 @@ export function DayColumn({ date, blocks, onUpdateBlock, onCreateBlock, onUpdate
             {isToday && <CurrentTimeIndicator />}
 
             <TimeBlockList blocks={positioned}
-                           onChange={onUpdateBlock}
-                           onUpdateTitle={onUpdateTitle}
-                           onCancelCreate={onCancelCreate}
+                           interactions={interactions}
             />
 
             {Array.from({ length: 24 }).map((_, h) => (

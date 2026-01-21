@@ -1,16 +1,13 @@
-import type { PositionedTimeBlock } from '../model/types'
+import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types'
 import './TimeBlock.css'
 import React, {useRef, useState, useEffect} from "react";
 
 type Props = {
     block: PositionedTimeBlock
-    onMouseDown: (e: React.MouseEvent) => void
-    onResizeMouseDown: (e: React.MouseEvent) => void
-    onUpdateTitle: (id: string, title: string) => void
-    onCancelCreate: (id: string) => void
+    interactions: TimeBlockInteractions
 }
 
-export function TimeBlock({ block, onMouseDown, onResizeMouseDown, onUpdateTitle, onCancelCreate }: Props) {
+export function TimeBlock({block, interactions}: Props) {
     const [title, setTitle] = useState(block.title)
     const inputRef = useRef<HTMLInputElement>(null)
     const isEditing = block.isNew || block.title === ''
@@ -23,15 +20,15 @@ export function TimeBlock({ block, onMouseDown, onResizeMouseDown, onUpdateTitle
 
     function commit() {
         if (title.trim() === '') {
-            onCancelCreate(block.id)
+            interactions.crud.cancelCreate(block.id)
         } else {
-            onUpdateTitle(block.id, title.trim())
+            interactions.crud.updateTitle(block.id, title.trim())
         }
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
         if (e.key === 'Enter') commit()
-        if (e.key === 'Escape') onCancelCreate(block.id)
+        if (e.key === 'Escape') interactions.crud.cancelCreate(block.id)
     }
 
     return (
@@ -46,10 +43,10 @@ export function TimeBlock({ block, onMouseDown, onResizeMouseDown, onUpdateTitle
             }}
             onMouseDown={e => {
                 if (isEditing) {
-                    e.stopPropagation() // 🔥 не начинаем drag
+                    e.stopPropagation()
                     return
                 }
-                onMouseDown(e)
+                interactions.move.start(e, block.id)
             }}
         >
             {isEditing ? (
@@ -76,8 +73,8 @@ export function TimeBlock({ block, onMouseDown, onResizeMouseDown, onUpdateTitle
             <div
                 className="time-block__resize-handle"
                 onMouseDown={e => {
-                    e.stopPropagation() // 🔥
-                    onResizeMouseDown(e)
+                    e.stopPropagation()
+                    interactions.resize.start(e, block.id)
                 }}
             />
         </div>

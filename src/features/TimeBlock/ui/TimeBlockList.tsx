@@ -1,27 +1,19 @@
-import type { PositionedTimeBlock } from '../model/types'
+import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types'
 import { TimeBlock } from './TimeBlock'
 import {useDragMove} from "../model/drag/useDragMove.ts";
 import {useDragResize} from "../model/drag/useDragResize.ts";
 
 type Props = {
     blocks: PositionedTimeBlock[]
-    onChange: (
-        id: string,
-        startAt: Date,
-        endAt: Date
-    ) => void
-    onUpdateTitle: (id: string, title: string) => void
-    onCancelCreate: (id: string) => void
+    interactions: TimeBlockInteractions
 }
 
 export function TimeBlockList({
                                   blocks,
-                                  onChange,
-                                  onUpdateTitle,
-                                  onCancelCreate,
+                                  interactions
                               }: Props) {
-    const move = useDragMove({onDrop: onChange,})
-    const resize = useDragResize({onDrop: onChange})
+    const move = useDragMove({onDrop: interactions.crud.updateBlockTime,})
+    const resize = useDragResize({onDrop: interactions.crud.updateBlockTime})
 
     return (
         <>
@@ -35,14 +27,14 @@ export function TimeBlockList({
                     height: resizeBind.draggedHeight
                 }
 
+                interactions.move.start = moveBind.onMouseDown
+                interactions.resize.start = resizeBind.onMouseDown
+
                 return (
                     <TimeBlock
                         key={block.id}
                         block={computedBlock}
-                        onMouseDown={moveBind.onMouseDown}
-                        onResizeMouseDown={resizeBind.onMouseDown}
-                        onUpdateTitle={onUpdateTitle}
-                        onCancelCreate={onCancelCreate}
+                        interactions={interactions}
                     />
                 )
             })}

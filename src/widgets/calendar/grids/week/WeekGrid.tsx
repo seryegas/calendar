@@ -4,7 +4,7 @@ import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
-import type {TimeBlock} from "../../../../features/TimeBlock/model/types.ts";
+import type {TimeBlock, TimeBlockInteractions} from "../../../../features/TimeBlock/model/types.ts";
 import {getBlocksForDay} from "../../../../features/TimeBlock/model/selectors.ts";
 
 export function WeekGrid() {
@@ -75,6 +75,21 @@ export function WeekGrid() {
         )
     }
 
+    const interactions: TimeBlockInteractions = {
+        move: {
+            start: () => {}
+        },
+        resize: {
+            start: () => {}
+        },
+        crud: {
+            create: handleCreateBlock,
+            updateBlockTime: handleUpdateBlock,
+            updateTitle: handleUpdateTitle,
+            cancelCreate: handleCancelCreate
+        }
+    }
+
     return (
         <div className="week">
             <div className="week-header">
@@ -104,10 +119,7 @@ export function WeekGrid() {
                                 key={day.toISOString()}
                                 date={day}
                                 blocks={getBlocksForDay(blocks, day)}
-                                onUpdateBlock={handleUpdateBlock}
-                                onCreateBlock={handleCreateBlock}
-                                onUpdateTitle={handleUpdateTitle}
-                                onCancelCreate={handleCancelCreate}
+                                interactions={interactions}
                             /> // отрефакторить в будущем (отфильтровать по дням блоки заранее
                         ))}
                     </div>
