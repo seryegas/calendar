@@ -42,7 +42,7 @@
 }
 
 .hour-label {
-    height: 61px;
+    height: 60px;
     font-size: 12px;
     color: #666;
 
@@ -61,6 +61,6 @@
 }
 
 .hour-cell {
-    height: 60px;
+    height: 59px;
     border-top: 1px solid #f0f0f0;
 }

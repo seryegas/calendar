@@ -7,6 +7,7 @@ export type TimeBlock = {
     startAt: Date
     endAt: Date
     color?: string
+    isNew?: boolean
 }
 
 export type PositionedTimeBlock = TimeBlock & {

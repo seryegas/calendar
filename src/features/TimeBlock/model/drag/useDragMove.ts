@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { dateFromTop } from './helpers.ts'
-import type { PositionedTimeBlock } from './types'
-
-type DragState = {
-    block: PositionedTimeBlock
-    startY: number
-    initialTop: number
-}
+import React, {useEffect, useState} from "react";
+import {dateFromTop, PIXEL_PER_MINUTES, snapMinutes} from "../helpers.ts";
+import type {PositionedTimeBlock} from "../types.ts";
+import type {DragMoveState} from "./types.ts";
 
 type Params = {
     onDrop: (id: string, startAt: Date, endAt: Date) => void
 }
 
-export function useTimeBlockDrag({ onDrop }: Params) {
-    const [drag, setDrag] = useState<DragState | null>(null)
+export function useDragMove({ onDrop }: Params) {
+    const [drag, setDrag] = useState<DragMoveState | null>(null)
     const [deltaY, setDeltaY] = useState(0)
 
     useEffect(() => {
@@ -54,7 +49,9 @@ export function useTimeBlockDrag({ onDrop }: Params) {
         }
     }, [drag, deltaY, onDrop])
 
-    function bind(block: PositionedTimeBlock) {
+    const snappedDeltaY = drag ? snapMinutes(deltaY / PIXEL_PER_MINUTES) * PIXEL_PER_MINUTES : 0
+
+    function bindMove(block: PositionedTimeBlock) {
         return {
             onMouseDown: (e: React.MouseEvent) => {
                 e.preventDefault()
@@ -68,10 +65,10 @@ export function useTimeBlockDrag({ onDrop }: Params) {
                 drag?.block.id === block.id,
             draggedTop:
                 drag?.block.id === block.id
-                    ? drag.initialTop + deltaY
+                    ? drag.initialTop + snappedDeltaY
                     : block.top,
         }
     }
 
-    return { bind }
+    return { bindMove }
 }

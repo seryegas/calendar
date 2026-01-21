@@ -5,10 +5,9 @@ const HOUR_HEIGHT = 60
 
 export function CurrentTimeIndicator() {
     const now = useCurrentTime()
-    const additionalPixels = 10
 
     const minutesFromStart =
-        now.getHours() * 60 + now.getMinutes() + additionalPixels
+        now.getHours() * 60 + now.getMinutes()
 
     const top = minutesFromStart * (HOUR_HEIGHT / 60)
 

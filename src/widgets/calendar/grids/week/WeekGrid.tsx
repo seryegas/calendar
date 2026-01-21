@@ -55,6 +55,26 @@ export function WeekGrid() {
         )
     }
 
+    function handleCreateBlock(block: TimeBlock) {
+        setBlocks(prev => [...prev, block])
+    }
+
+    function handleUpdateTitle(id: string, title: string) {
+        setBlocks(prev =>
+            prev.map(b =>
+                b.id === id
+                    ? { ...b, title, isNew: false }
+                    : b
+            )
+        )
+    }
+
+    function handleCancelCreate(id: string) {
+        setBlocks(prev =>
+            prev.filter(b => b.id !== id)
+        )
+    }
+
     return (
         <div className="week">
             <div className="week-header">
@@ -85,6 +105,9 @@ export function WeekGrid() {
                                 date={day}
                                 blocks={getBlocksForDay(blocks, day)}
                                 onUpdateBlock={handleUpdateBlock}
+                                onCreateBlock={handleCreateBlock}
+                                onUpdateTitle={handleUpdateTitle}
+                                onCancelCreate={handleCancelCreate}
                             /> // отрефакторить в будущем (отфильтровать по дням блоки заранее
                         ))}
                     </div>

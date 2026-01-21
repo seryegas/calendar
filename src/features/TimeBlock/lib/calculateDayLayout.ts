@@ -10,12 +10,10 @@ export function calculateDayLayout(
 ): PositionedTimeBlock[] {
     if (blocks.length === 0) return []
 
-    // 1️⃣ Сортируем по времени начала
     const sorted = [...blocks].sort(
         (a, b) => a.startAt.getTime() - b.startAt.getTime()
     )
 
-    // 2️⃣ Группируем пересекающиеся блоки
     const groups: TimeBlock[][] = []
 
     for (const block of sorted) {
@@ -36,7 +34,6 @@ export function calculateDayLayout(
 
     const result: PositionedTimeBlock[] = []
 
-    // 3️⃣ В каждой группе раскладываем по колонкам
     for (const group of groups) {
         const sortedGroup = [...group].sort(
             (a, b) => a.startAt.getTime() - b.startAt.getTime()
@@ -64,7 +61,6 @@ export function calculateDayLayout(
 
         const columnsCount = columns.length
 
-        // 4️⃣ Формируем PositionedTimeBlock
         columns.forEach((column, columnIndex) => {
             column.forEach(block => {
                 result.push({
@@ -77,8 +73,6 @@ export function calculateDayLayout(
             })
         })
     }
-
-    console.log(result)
 
     return result
 }
