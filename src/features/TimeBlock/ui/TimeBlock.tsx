@@ -48,6 +48,10 @@ export function TimeBlock({block, interactions}: Props) {
                 }
                 interactions.move.start(e, block.id)
             }}
+            onContextMenu={e =>  {
+                e.preventDefault()
+                interactions.menu.open(e.clientX, e.clientY, block)
+            }}
         >
             {isEditing ? (
                 <input
@@ -57,7 +61,7 @@ export function TimeBlock({block, interactions}: Props) {
                     onChange={e => setTitle(e.target.value)}
                     onBlur={commit}
                     onKeyDown={onKeyDown}
-                    onMouseDown={e => e.stopPropagation()} // 🔥
+                    onMouseDown={e => e.stopPropagation()}
                 />
             ) : (
                 <div className="time-block__title">

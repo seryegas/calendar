@@ -27,14 +27,15 @@ export function TimeBlockList({
                     height: resizeBind.draggedHeight
                 }
 
-                interactions.move.start = moveBind.onMouseDown
-                interactions.resize.start = resizeBind.onMouseDown
-
                 return (
                     <TimeBlock
                         key={block.id}
                         block={computedBlock}
-                        interactions={interactions}
+                        interactions={{
+                            ...interactions,
+                            move: { start: moveBind.onMouseDown },
+                            resize: { start: resizeBind.onMouseDown },
+                        }}
                     />
                 )
             })}

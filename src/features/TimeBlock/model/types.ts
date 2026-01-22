@@ -34,6 +34,12 @@ export type TimeBlockInteractions = {
         ) => void
     }
 
+    menu: {
+        open: (x: number, y: number, block: TimeBlock) => void
+        close: () => void
+        isOpen: () => boolean
+    }
+
     crud: {
         create: (block: TimeBlock) => void
         updateBlockTime: (
@@ -46,5 +52,7 @@ export type TimeBlockInteractions = {
             title: string
         ) => void
         cancelCreate: (id: string) => void
+        deleteBlock: (id: string) => void
+        changeColor: (id: string, color: string) => void
     }
 }

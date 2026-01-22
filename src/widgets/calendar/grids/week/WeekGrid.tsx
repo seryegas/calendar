@@ -1,15 +1,23 @@
 import './ui/WeekGrid.css'
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
 import type {TimeBlock, TimeBlockInteractions} from "../../../../features/TimeBlock/model/types.ts";
 import {getBlocksForDay} from "../../../../features/TimeBlock/model/selectors.ts";
+import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx";
 
 export function WeekGrid() {
     const {selectedDay} = useCalendar()
     const weekStart = startOfWeek(selectedDay);
+    const [menuState, setMenuState] = useState<{
+        visible: boolean
+        x: number
+        y: number
+        block: TimeBlock | null
+    }>({ visible: false, x: 0, y: 0, block: null });
+    const ignoreNextClickRef = useRef(false);
 
     const [blocks, setBlocks] = useState<TimeBlock[]>([
         {
@@ -75,6 +83,38 @@ export function WeekGrid() {
         )
     }
 
+    function handleDeleteBlock(id: string) {
+        setBlocks(prev => prev.filter(b => b.id !== id))
+    }
+
+    function handleChangeColor(id: string, color: string) {
+        setBlocks(prev =>
+            prev.map(b => b.id === id ? { ...b, color } : b)
+        );
+    }
+
+    function handleMenuOpen(x: number, y: number, block: TimeBlock) {
+        setMenuState({ visible: true, x, y, block })
+    }
+
+    function handleMenuClose() {
+        ignoreNextClickRef.current = true;
+
+        setMenuState(prev => ({
+            ...prev,
+            visible: false,
+            block: null
+        }));
+
+        setTimeout(() => {
+            ignoreNextClickRef.current = false;
+        }, 0);
+    }
+
+    function handleMenuIsOpen() {
+        return menuState.visible
+    }
+
     const interactions: TimeBlockInteractions = {
         move: {
             start: () => {}
@@ -82,11 +122,18 @@ export function WeekGrid() {
         resize: {
             start: () => {}
         },
+        menu: {
+            open: handleMenuOpen,
+            close: handleMenuClose,
+            isOpen: handleMenuIsOpen
+        },
         crud: {
             create: handleCreateBlock,
             updateBlockTime: handleUpdateBlock,
             updateTitle: handleUpdateTitle,
-            cancelCreate: handleCancelCreate
+            cancelCreate: handleCancelCreate,
+            deleteBlock: handleDeleteBlock,
+            changeColor: handleChangeColor
         }
     }
 
@@ -125,6 +172,14 @@ export function WeekGrid() {
                     </div>
                 </div>
             </div>
+            {menuState.visible && menuState.block && (
+                <TimeBlockMenu
+                    block={menuState.block}
+                    x={menuState.x}
+                    y={menuState.y}
+                    interactions={interactions}
+                />
+            )}
         </div>
     )
 }

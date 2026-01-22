@@ -52,6 +52,8 @@ export function useDragMove({ onDrop }: Params) {
     const snappedDeltaY = drag ? snapMinutes(deltaY / PIXEL_PER_MINUTES) * PIXEL_PER_MINUTES : 0
 
     function bindMove(block: PositionedTimeBlock) {
+        console.log('bind', block.id)
+
         return {
             onMouseDown: (e: React.MouseEvent) => {
                 e.preventDefault()
