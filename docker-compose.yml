@@ -14,19 +14,21 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    environment:
-      MONGO_URI: mongodb://mongo:27017/calendar
     ports:
       - "4000:4000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       - mongo
 
   mongo:
     env_file:
       - backend/.env
-    image: mongo:8
+    image: mongo:7
     volumes:
       - mongo_data:/data/db
 
 volumes:
   mongo_data:
+    driver: local
