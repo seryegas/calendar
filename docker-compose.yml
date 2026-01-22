@@ -9,3 +9,24 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo:27017/calendar
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+
+  mongo:
+    env_file:
+      - backend/.env
+    image: mongo:8
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
