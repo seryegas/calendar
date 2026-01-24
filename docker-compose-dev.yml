@@ -4,9 +4,9 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     env_file:
-      - .env
+      - .env.dev
     environment:
       NODE_ENV: production
     ports:
