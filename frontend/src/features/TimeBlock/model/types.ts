@@ -27,17 +27,11 @@ export type Period = {
 
 export type TimeBlockInteractions = {
     move: {
-        start: (
-            e: React.MouseEvent,
-            blockId: string
-        ) => void
+        start: (e: React.MouseEvent, blockId: string) => void
     }
 
     resize: {
-        start: (
-            e: React.MouseEvent,
-            blockId: string
-        ) => void
+        start: (e: React.MouseEvent, blockId: string) => void
     }
 
     menu: {
@@ -47,16 +41,10 @@ export type TimeBlockInteractions = {
     }
 
     crud: {
-        create: (block: TimeBlock) => void
-        updateBlockTime: (
-            id: string,
-            startAt: Date,
-            endAt: Date
-        ) => void
-        updateTitle: (
-            id: string,
-            title: string
-        ) => void
+        createDraft: (block: TimeBlock) => void
+        commitCreate: (id: string, title: string) => void
+        updateBlockTime: (id: string, startAt: Date, endAt: Date) => void
+        updateTitle: (id: string, title: string) => void
         cancelCreate: (id: string) => void
         deleteBlock: (id: string) => void
         changeColor: (id: string, color: string) => void

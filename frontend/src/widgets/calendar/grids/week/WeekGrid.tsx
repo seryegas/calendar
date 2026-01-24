@@ -8,26 +8,44 @@ import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx
 import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTimeBlockController.ts";
 import {createTimeBlockRepository} from "../../../../features/TimeBlock/storage";
 import type {Period} from "../../../../features/TimeBlock/model/types.ts";
+import {useMemo} from "react";
 
 export function WeekGrid() {
-    const {selectedDay} = useCalendar()
-    const weekStart = startOfWeek(selectedDay);
+    const { selectedDay } = useCalendar()
+    const weekStart = useMemo(
+        () => startOfWeek(selectedDay),
+        [selectedDay]
+    )
+    const repository = useMemo(
+        () => createTimeBlockRepository(),
+        []
+    )
 
-    const repository = createTimeBlockRepository()
-    const period: Period = {view: "week", startDate: weekStart}
-    const initialBlocks = repository.getByPeriod(period)
+    const period = useMemo<Period>(() => ({
+        view: 'week',
+        startDate: weekStart
+    }), [weekStart])
 
     const {
         blocks,
         menuState,
-        interactions
-    } = useTimeBlocksController({initialBlocks})
+        interactions,
+        isLoading
+    } = useTimeBlocksController({ repository, period })
 
-    const days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(weekStart)
-        d.setDate(d.getDate() + i)
-        return d
-    })
+    const days = useMemo(
+        () =>
+            Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(weekStart)
+                d.setDate(d.getDate() + i)
+                return d
+            }),
+        [weekStart]
+    )
+
+    if (isLoading) {
+        return <div>Loading…</div>
+    }
 
     return (
         <div className="week">

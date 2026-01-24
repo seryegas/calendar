@@ -1,12 +1,35 @@
-import {useRef, useState} from 'react'
-import type {TimeBlock, TimeBlockInteractions} from '../model/types'
+import {useEffect, useRef, useState} from 'react'
+import type {Period, TimeBlock, TimeBlockInteractions} from '../model/types'
+import type {TimeBlockRepository} from "../storage/TimeBlockRepository.ts";
 
 type Props = {
-    initialBlocks: TimeBlock[]
+    repository: TimeBlockRepository
+    period: Period
 }
 
-export function useTimeBlocksController({initialBlocks}: Props) {
-    const [blocks, setBlocks] = useState<TimeBlock[]>(initialBlocks)
+export function useTimeBlocksController({repository, period}: Props) {
+    const [blocks, setBlocks] = useState<TimeBlock[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        let cancelled = false
+
+        async function load() {
+            setIsLoading(true)
+            const data = await repository.getByPeriod(period)
+            if (!cancelled) {
+                setBlocks(data)
+                setIsLoading(false)
+            }
+        }
+
+        load()
+
+        return () => {
+            cancelled = true
+        }
+    }, [repository, period])
+
     const [menuState, setMenuState] = useState<{
         visible: boolean
         x: number
@@ -16,30 +39,74 @@ export function useTimeBlocksController({initialBlocks}: Props) {
 
     const ignoreNextClickRef = useRef(false)
 
-    function create(block: TimeBlock) {
-        setBlocks(prev => [...prev, block])
+    async function commitCreate(id: string, title: string) {
+        let savedBlock: TimeBlock | null = null
+
+        setBlocks(prev =>
+            prev.map(b => {
+                if (b.id === id) {
+                    savedBlock = { ...b, title, isNew: false }
+                    return savedBlock
+                }
+                return b
+            })
+        )
+
+        if (!savedBlock) return
+
+        try {
+            await repository.create(savedBlock)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    function updateTime(id: string, startAt: Date, endAt: Date) {
+    async function updateTime(id: string, startAt: Date, endAt: Date) {
         setBlocks(prev =>
             prev.map(b => b.id === id ? { ...b, startAt, endAt } : b)
         )
+
+        try {
+            await repository.update(id, {startAt, endAt })
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    function updateTitle(id: string, title: string) {
+    async function updateTitle(id: string, title: string) {
         setBlocks(prev =>
             prev.map(b => b.id === id ? { ...b, title, isNew: false } : b)
         )
+
+        try {
+            await repository.update(id, { title })
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    function deleteBlock(id: string) {
+    async function deleteBlock(id: string) {
+        const prevBlocks = blocks
+
         setBlocks(prev => prev.filter(b => b.id !== id))
+
+        try {
+            await repository.delete(id)
+        } catch (e) {
+            setBlocks(prevBlocks)
+        }
     }
 
-    function changeColor(id: string, color: string) {
+    async function changeColor(id: string, color: string) {
         setBlocks(prev =>
             prev.map(b => b.id === id ? { ...b, color } : b)
         )
+
+        try {
+            await repository.update(id, { color })
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     function openMenu(x: number, y: number, block: TimeBlock) {
@@ -56,6 +123,10 @@ export function useTimeBlocksController({initialBlocks}: Props) {
         }, 0)
     }
 
+    function createDraft(block: TimeBlock) {
+        setBlocks(prev => [...prev, block])
+    }
+
     const interactions: TimeBlockInteractions = {
         move: { start: () => {} },
         resize: { start: () => {} },
@@ -65,7 +136,8 @@ export function useTimeBlocksController({initialBlocks}: Props) {
             isOpen: () => menuState.visible
         },
         crud: {
-            create,
+            createDraft,
+            commitCreate,
             updateBlockTime: updateTime,
             updateTitle,
             deleteBlock,
@@ -76,6 +148,7 @@ export function useTimeBlocksController({initialBlocks}: Props) {
 
     return {
         blocks,
+        isLoading,
         menuState,
         interactions,
         ignoreNextClickRef

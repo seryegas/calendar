@@ -28,7 +28,7 @@ export function DayColumn({ date, blocks, interactions }: Props) {
             startAt.getTime() + 60 * 60 * 1000
         )
 
-        interactions.crud.create({
+        interactions.crud.createDraft({
             id: crypto.randomUUID(),
             title: '',
             startAt,

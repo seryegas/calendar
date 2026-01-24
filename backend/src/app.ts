@@ -10,5 +10,5 @@ app.use(express.json())
 app.use('/api/time-blocks', timeBlockRouter)
 
 app.get('/ping', (_, res) => {
-    res.json({ ok: true })
+    res.json({ ok: "444123" })
 })

@@ -29,6 +29,8 @@
 .week-scroll {
     flex: 1;
     overflow-y: auto;
+    margin-bottom: 60px;
+    overscroll-behavior: none;
 }
 
 .days-grid {

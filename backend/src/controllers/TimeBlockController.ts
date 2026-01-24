@@ -18,6 +18,7 @@ export class TimeBlockController {
     }
 
     static async create(req: Request, res: Response) {
+        console.log(req.body)
         const block = await TimeBlockModel.create(req.body)
         res.status(201).json(block)
     }

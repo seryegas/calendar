@@ -19,10 +19,18 @@ export function TimeBlock({block, interactions}: Props) {
     }, [isEditing])
 
     function commit() {
-        if (title.trim() === '') {
+        const value = title.trim()
+        console.log(value)
+
+        if (value === '') {
             interactions.crud.cancelCreate(block.id)
+            return
+        }
+
+        if (block.isNew) {
+            interactions.crud.commitCreate(block.id, value)
         } else {
-            interactions.crud.updateTitle(block.id, title.trim())
+            interactions.crud.updateTitle(block.id, value)
         }
     }
 
