@@ -13,6 +13,7 @@ Handles displaying weeks, days, time blocks, and user interactions.
 1. clone the repository:
 ```bash
 git clone https://github.com/seryegas/calendar.git
+cd calendar
 ```
 2. create .env file (or copy from .env.prod
 ```bash
