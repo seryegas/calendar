@@ -47,3 +47,16 @@
     background: transparent;
     font-size: 12px;
 }
+
+.time-block__timeline {
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.75;
+    margin-bottom: 4px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: #1f1f1f;
+}

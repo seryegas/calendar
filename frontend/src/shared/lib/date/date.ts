@@ -41,3 +41,10 @@ export function getPeriodStartDate(view: CalendarView, date: Date): Date {
             return result
     }
 }
+
+export function formatTime(date: Date) {
+    return date.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+    })
+}

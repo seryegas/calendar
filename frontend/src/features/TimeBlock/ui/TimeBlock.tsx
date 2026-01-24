@@ -1,6 +1,8 @@
 import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types'
 import './TimeBlock.css'
 import React, {useRef, useState, useEffect} from "react";
+import {formatTime} from "../../../shared/lib/date/date.ts";
+import {PIXEL_PER_MINUTES} from "../model/helpers.ts";
 
 type Props = {
     block: PositionedTimeBlock
@@ -74,6 +76,12 @@ export function TimeBlock({block, interactions}: Props) {
             ) : (
                 <div className="time-block__title">
                     {block.title}
+                </div>
+            )}
+
+            {block.startAt && block.endAt && block.height > PIXEL_PER_MINUTES * 30 && (
+                <div className="time-block__timeline">
+                    {formatTime(block.startAt)} – {formatTime(block.endAt)}
                 </div>
             )}
 

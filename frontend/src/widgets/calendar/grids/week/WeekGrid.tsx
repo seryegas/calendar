@@ -8,7 +8,7 @@ import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx
 import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTimeBlockController.ts";
 import {createTimeBlockRepository} from "../../../../features/TimeBlock/storage";
 import type {Period} from "../../../../features/TimeBlock/model/types.ts";
-import {useMemo} from "react";
+import {useEffect, useMemo, useRef} from "react";
 
 export function WeekGrid() {
     const { selectedDay } = useCalendar()
@@ -16,6 +16,7 @@ export function WeekGrid() {
         () => startOfWeek(selectedDay),
         [selectedDay]
     )
+    const scrollRef = useRef<HTMLDivElement>(null);
     const repository = useMemo(
         () => createTimeBlockRepository(),
         []
@@ -43,6 +44,19 @@ export function WeekGrid() {
         [weekStart]
     )
 
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+
+        const saved = localStorage.getItem('week-scroll');
+
+        if (saved === null) return;
+
+        requestAnimationFrame(() => {
+            el.scrollTop = Number(saved);
+        });
+    }, [weekStart, isLoading]);
+
     if (isLoading) {
         return <div>Loading…</div>
     }
@@ -56,7 +70,10 @@ export function WeekGrid() {
                 ))}
             </div>
 
-            <div className="week-scroll">
+            <div className="week-scroll" ref={scrollRef} onScroll={() => {
+                if (!scrollRef.current) return
+                localStorage.setItem('week-scroll', String(scrollRef.current.scrollTop));
+            }}>
                 <div className="week-body">
                     <div className="time-col">
                         {Array.from({ length: 24 }, (_, h) => (
