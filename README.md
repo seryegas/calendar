@@ -12,7 +12,7 @@ Handles displaying weeks, days, time blocks, and user interactions.
 ### Steps
 1. clone the repository:
 ```bash
-git clone https://gitlab.com/seryegas/calendar.git
+git clone https://github.com/seryegas/calendar.git
 ```
 2. create .env file (or copy from .env.prod
 ```bash
