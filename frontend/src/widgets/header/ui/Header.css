@@ -130,3 +130,9 @@
 .account-button:hover {
     background: #1765cc;
 }
+
+.view-switcher__button.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
