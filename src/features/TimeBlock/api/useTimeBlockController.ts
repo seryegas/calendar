@@ -128,7 +128,7 @@ export function useTimeBlocksController({repository, period}: Props) {
     }
 
     const interactions: TimeBlockInteractions = {
-        move: { start: () => {} },
+        move: { start: () => {}, deltaX: 0 },
         resize: { start: () => {} },
         menu: {
             open: openMenu,

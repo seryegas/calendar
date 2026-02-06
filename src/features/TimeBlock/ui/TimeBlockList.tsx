@@ -33,7 +33,7 @@ export function TimeBlockList({
                         block={computedBlock}
                         interactions={{
                             ...interactions,
-                            move: { start: moveBind.onMouseDown },
+                            move: { start: moveBind.onMouseDown, deltaX: moveBind.draggedDeltaX },
                             resize: { start: resizeBind.onMouseDown },
                         }}
                     />

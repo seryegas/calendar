@@ -7,6 +7,8 @@ export type DragBase = {
 
 export type DragMoveState = DragBase & {
     initialTop: number
+    startX: number
+    columnWidth: number
 }
 
 export type DragResizeState = DragBase & {

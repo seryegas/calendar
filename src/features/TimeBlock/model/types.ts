@@ -28,6 +28,7 @@ export type Period = {
 export type TimeBlockInteractions = {
     move: {
         start: (e: React.MouseEvent, blockId: string) => void
+        deltaX: number
     }
 
     resize: {

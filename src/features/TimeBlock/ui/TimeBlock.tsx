@@ -50,6 +50,8 @@ export function TimeBlock({block, interactions}: Props) {
                 left: `${block.left}%`,
                 width: `${block.width}%`,
                 backgroundColor: block.color ?? '#d2e3fc',
+                transform: interactions.move.deltaX ? `translateX(${interactions.move.deltaX}px)` : undefined,
+                zIndex: interactions.move.deltaX ? 100 : undefined,
             }}
             onMouseDown={e => {
                 if (isEditing) {
