@@ -15,7 +15,9 @@ export class ApiRepository implements TimeBlockRepository {
         const start = new Date(startDate)
         const end = new Date(start)
 
-        if (view === 'week') {
+        if (view === 'day') {
+            end.setDate(end.getDate() + 1)
+        } else if (view === 'week') {
             end.setDate(end.getDate() + 7)
         }
 

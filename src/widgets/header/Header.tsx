@@ -5,9 +5,9 @@ import {useCalendar} from "../../app/providers/CalendarProvider.tsx";
 import {Navigation} from "./ui/Navigation.tsx";
 
 export function Header(){
-    const { selectedDay } = useCalendar()
+    const { selectedDay, view } = useCalendar()
 
-    const currentDate = formatRange(selectedDay)
+    const currentDate = formatRange(selectedDay, view)
 
     return (
         <header className="header">

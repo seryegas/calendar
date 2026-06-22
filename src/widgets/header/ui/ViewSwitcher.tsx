@@ -6,7 +6,7 @@ export function ViewSwitcher() {
     const { view, setView, selectedDay, setSelectedDay } = useCalendar()
 
     const handleChange = (view: CalendarView) => {
-        if (view !== 'week') return // пока разрешна только неделя
+        if (view === 'month' || view === 'year') return
 
         setView(view)
         setSelectedDay(getPeriodStartDate(view, selectedDay))
@@ -20,11 +20,11 @@ export function ViewSwitcher() {
                     className={`
                         view-switcher__button
                         ${v === view ? 'is-active' : ''}
-                        ${v !== 'week' ? 'is-disabled' : ''}
+                        ${v === 'month' || v === 'year' ? 'is-disabled' : ''}
                     `}
                     onClick={() => handleChange(v)}
                     type="button"
-                    disabled={v !== 'week'} // делает кнопку не кликабельной
+                    disabled={v === 'month' || v === 'year'}
                 >
                     {labelByView[v]}
                 </button>

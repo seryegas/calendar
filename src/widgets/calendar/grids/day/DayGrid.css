@@ -1,0 +1,29 @@
+.day-view {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: system-ui, sans-serif;
+}
+
+.day-view-header {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.day-view-scroll {
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 60px;
+    overscroll-behavior: none;
+}
+
+.day-view-body {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    align-items: start;
+}

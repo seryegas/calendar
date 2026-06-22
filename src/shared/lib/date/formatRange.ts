@@ -1,5 +1,15 @@
-export function formatRange(startDate: Date): string {
+import type {CalendarView} from "../../../app/providers/CalendarProvider.tsx";
+
+export function formatRange(startDate: Date, view: CalendarView = 'week'): string {
     const start = new Date(startDate)
+
+    if (view === 'day') {
+        return new Intl.DateTimeFormat('ru', {
+            day: 'numeric',
+            month: 'long',
+        }).format(start)
+    }
+
     const end = new Date(startDate)
     end.setDate(start.getDate() + 6)
 
