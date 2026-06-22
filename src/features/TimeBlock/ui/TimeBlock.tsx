@@ -2,11 +2,17 @@ import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types.ts
 import './TimeBlock.css'
 import React, {useRef, useState, useEffect} from "react";
 import {formatTime} from "../../../shared/lib/date/date.ts";
-import {PIXEL_PER_MINUTES} from "../model/helpers.ts";
 
 type Props = {
     block: PositionedTimeBlock
     interactions: TimeBlockInteractions
+}
+
+function getSizeTier(height: number): string {
+    if (height <= 15) return 'time-block--mini'
+    if (height <= 30) return 'time-block--small'
+    if (height < 60) return 'time-block--compact'
+    return ''
 }
 
 export function TimeBlock({block, interactions}: Props) {
@@ -16,6 +22,8 @@ export function TimeBlock({block, interactions}: Props) {
 
     const segment = block.segment
     const source = block.sourceBlock
+
+    const sizeTier = getSizeTier(block.height)
 
     const segmentClass =
         segment === 'head' ? ' time-block--head' :
@@ -50,7 +58,7 @@ export function TimeBlock({block, interactions}: Props) {
 
     return (
         <div
-            className={`time-block${segmentClass}`}
+            className={`time-block${segmentClass}${sizeTier ? ' ' + sizeTier : ''}`}
             style={{
                 top: block.top,
                 height: block.height - 2,
@@ -73,29 +81,31 @@ export function TimeBlock({block, interactions}: Props) {
                 interactions.menu.open(e.clientX, e.clientY, source)
             }}
         >
-            {isEditing ? (
-                <input
-                    ref={inputRef}
-                    className="time-block__input"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    onBlur={commit}
-                    onKeyDown={onKeyDown}
-                    onMouseDown={e => e.stopPropagation()}
-                />
-            ) : (
-                <div className="time-block__title">
-                    {block.title}
-                </div>
-            )}
+            <div className="time-block__header">
+                {isEditing ? (
+                    <input
+                        ref={inputRef}
+                        className="time-block__input"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        onBlur={commit}
+                        onKeyDown={onKeyDown}
+                        onMouseDown={e => e.stopPropagation()}
+                    />
+                ) : (
+                    <div className="time-block__title">
+                        {block.title}
+                    </div>
+                )}
 
-            {block.height > PIXEL_PER_MINUTES * 30 && (
                 <div className="time-block__timeline">
-                    {formatTime(source.startAt)} – {formatTime(source.endAt)}
+                    {block.height > 30
+                        ? `${formatTime(source.startAt)} – ${formatTime(source.endAt)}`
+                        : formatTime(source.startAt)}
                 </div>
-            )}
+            </div>
 
-            {block.description && (
+            {block.description && block.height >= 30 && (
                 <div className="time-block__description">
                     {block.description}
                 </div>
