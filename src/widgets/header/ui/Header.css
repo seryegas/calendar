@@ -2,10 +2,10 @@
     height: 56px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 16px;
     border-bottom: 1px solid #e0e0e0;
     background: #fff;
-    gap: 16px;
     box-sizing: border-box;
 }
 
@@ -14,65 +14,30 @@
 .header-left {
     display: flex;
     align-items: center;
-    min-width: 160px;
+    gap: 12px;
 }
 
 .logo {
-    font-size: 24px;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
     color: #202124;
     white-space: nowrap;
+    margin-right: 4px;
 }
 
-/* ===== CENTER ===== */
-
-.header-center {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    justify-content: center;
-    min-width: 0;
+.logo-icon {
+    color: #1a73e8;
+    flex-shrink: 0;
 }
 
 .current-date {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
     color: #202124;
     white-space: nowrap;
-    width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ===== VIEW SWITCHER ===== */
-
-.view-switcher {
-    display: flex;
-    background: #f1f3f4;
-    border-radius: 8px;
-    padding: 2px;
-}
-
-.view-switcher__button {
-    border: none;
-    background: transparent;
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #5f6368;
-}
-
-.view-switcher__button:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.view-switcher__button.is-active {
-    background: #fff;
-    color: #1a73e8;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 /* ===== NAVIGATION ===== */
@@ -80,7 +45,7 @@
 .calendar-nav {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .calendar-nav button {
@@ -88,23 +53,28 @@
     min-width: 36px;
     padding: 0 12px;
     border: 1px solid #dadce0;
-    background: #fff;
-    border-radius: 6px;
-    font-size: 14px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    font-size: 16px;
     cursor: pointer;
-    color: #202124;
+    color: #5f6368;
+    transition: background 0.15s, border-color 0.15s;
 }
 
 .calendar-nav button:hover {
-    background: #f1f3f4;
+    background: #e8eaed;
+    border-color: #c6c9cc;
 }
 
 .calendar-nav button:active {
-    background: #e8eaed;
+    background: #dadce0;
 }
 
 .calendar-today {
     font-weight: 500;
+    color: #202124;
+    border-radius: 6px !important;
+    padding: 0 12px !important;
 }
 
 /* ===== RIGHT ===== */
@@ -112,19 +82,21 @@
 .header-right {
     display: flex;
     align-items: center;
-    min-width: 120px;
-    justify-content: flex-end;
+    gap: 12px;
 }
 
 .account-button {
-    height: 36px;
-    padding: 0 12px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     border-radius: 50%;
     border: none;
     background: #1a73e8;
     color: #fff;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 500;
+    transition: background 0.15s;
 }
 
 .account-button:hover {
@@ -132,7 +104,7 @@
 }
 
 .view-switcher__button.is-disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
 }
