@@ -13,11 +13,15 @@ export type TimeBlock = {
     isNew?: boolean
 }
 
+export type SegmentPosition = 'full' | 'head' | 'tail'
+
 export type PositionedTimeBlock = TimeBlock & {
     top: number
     height: number
     left: number
     width: number
+    segment: SegmentPosition
+    sourceBlock: TimeBlock
 }
 
 export type Period = {

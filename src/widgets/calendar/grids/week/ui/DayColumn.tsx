@@ -1,19 +1,21 @@
 import { CurrentTimeIndicator } from "../../../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
 import {TimeBlockList} from "../../../../../features/TimeBlock/ui/TimeBlockList.tsx";
-import type {TimeBlock, TimeBlockInteractions} from "../../../../../features/TimeBlock/model/types.ts";
+import type {TimeBlockInteractions, SegmentPosition, TimeBlock} from "../../../../../features/TimeBlock/model/types.ts";
 import {calculateDayLayout} from "../../../../../features/TimeBlock/lib/calculateDayLayout.ts";
 import {dateFromTop} from "../../../../../features/TimeBlock/model/helpers.ts";
 import type {useDragMove} from "../../../../../features/TimeBlock/model/drag/useDragMove.ts";
 import React from "react";
 
+type DaySegment = TimeBlock & { segment: SegmentPosition, sourceBlock: TimeBlock }
+
 type Props = {
     date: Date,
-    blocks: TimeBlock[]
+    segments: DaySegment[]
     interactions: TimeBlockInteractions
     moveHook: ReturnType<typeof useDragMove>
 }
 
-export function DayColumn({ date, blocks, interactions, moveHook }: Props) {
+export function DayColumn({ date, segments, interactions, moveHook }: Props) {
     function handleDayClick(
         e: React.MouseEvent<HTMLDivElement>
     ) {
@@ -42,7 +44,7 @@ export function DayColumn({ date, blocks, interactions, moveHook }: Props) {
 
     const now = new Date()
 
-    const positioned = calculateDayLayout(blocks)
+    const positioned = calculateDayLayout(segments)
 
     const isToday =
         date.getFullYear() === now.getFullYear() &&

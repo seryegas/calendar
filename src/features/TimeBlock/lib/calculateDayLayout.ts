@@ -1,12 +1,14 @@
-import type { TimeBlock, PositionedTimeBlock } from '../model/types.ts'
+import type { TimeBlock, PositionedTimeBlock, SegmentPosition } from '../model/types.ts'
 import { blockTop, blockHeight } from '../model/helpers.ts'
 
-function overlaps(a: TimeBlock, b: TimeBlock): boolean {
+type DaySegment = TimeBlock & { segment: SegmentPosition, sourceBlock: TimeBlock }
+
+function overlaps(a: DaySegment, b: DaySegment): boolean {
     return a.startAt < b.endAt && b.startAt < a.endAt
 }
 
 export function calculateDayLayout(
-    blocks: TimeBlock[]
+    blocks: DaySegment[]
 ): PositionedTimeBlock[] {
     if (blocks.length === 0) return []
 
@@ -14,7 +16,7 @@ export function calculateDayLayout(
         (a, b) => a.startAt.getTime() - b.startAt.getTime()
     )
 
-    const groups: TimeBlock[][] = []
+    const groups: DaySegment[][] = []
 
     for (const block of sorted) {
         let placed = false
@@ -39,7 +41,7 @@ export function calculateDayLayout(
             (a, b) => a.startAt.getTime() - b.startAt.getTime()
         )
 
-        const columns: TimeBlock[][] = []
+        const columns: DaySegment[][] = []
 
         for (const block of sortedGroup) {
             let placed = false

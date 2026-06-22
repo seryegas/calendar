@@ -16,6 +16,7 @@ export function useDragResize({ onDrop }: Params) {
             block: PositionedTimeBlock
             startY: number
             initialHeight: number
+            realStartAt: Date
         } | null>(null)
 
     const [deltaY, setDeltaY] = useState(0)
@@ -39,7 +40,7 @@ export function useDragResize({ onDrop }: Params) {
                 minutes * 60 * 1000
             )
 
-            onDrop(state.block.id, state.block.startAt, newEnd)
+            onDrop(state.block.id, state.realStartAt, newEnd)
             setState(null)
             setDeltaY(0)
         }
@@ -54,7 +55,7 @@ export function useDragResize({ onDrop }: Params) {
     }, [state, deltaY])
 
     return {
-        bindResize(block: PositionedTimeBlock) {
+        bindResize(block: PositionedTimeBlock, realStartAt?: Date) {
             return {
                 onMouseDown: (e: React.MouseEvent) => {
                     e.stopPropagation()
@@ -63,6 +64,7 @@ export function useDragResize({ onDrop }: Params) {
                         block,
                         startY: e.clientY,
                         initialHeight: block.height,
+                        realStartAt: realStartAt ?? block.startAt,
                     })
                 },
                 draggedHeight:

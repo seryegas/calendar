@@ -3,7 +3,7 @@ import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
 import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
-import {getBlocksForDay} from "../../../../features/TimeBlock/model/selectors.ts";
+import {getSegmentsForDay} from "../../../../features/TimeBlock/model/selectors.ts";
 import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx";
 import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTimeBlockController.ts";
 import {createTimeBlockRepository} from "../../../../features/TimeBlock/storage";
@@ -109,7 +109,7 @@ export function WeekGrid() {
                             <DayColumn
                                 key={day.toISOString()}
                                 date={day}
-                                blocks={getBlocksForDay(previewBlocks, day)}
+                                segments={getSegmentsForDay(previewBlocks, day)}
                                 interactions={interactions}
                                 moveHook={move}
                             />

@@ -19,17 +19,25 @@ export function TimeBlockList({
     return (
         <>
             {blocks.map(block => {
-                const moveBind = moveHook.bindMove(block)
-                const resizeBind = resize.bindResize(block)
+                const source = block.sourceBlock
 
-                const computedBlock = {
+                const moveBlock: PositionedTimeBlock = {
                     ...block,
-                    height: resizeBind.draggedHeight
+                    startAt: source.startAt,
+                    endAt: source.endAt,
+                }
+
+                const moveBind = moveHook.bindMove(moveBlock)
+                const resizeBind = resize.bindResize(block, source.startAt)
+
+                const computedBlock: PositionedTimeBlock = {
+                    ...block,
+                    height: resizeBind.draggedHeight,
                 }
 
                 return (
                     <TimeBlock
-                        key={block.id}
+                        key={block.id + '-' + block.segment}
                         block={computedBlock}
                         interactions={{
                             ...interactions,

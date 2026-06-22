@@ -2,7 +2,7 @@ import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types.ts
 import './TimeBlock.css'
 import React, {useRef, useState, useEffect} from "react";
 import {formatTime} from "../../../shared/lib/date/date.ts";
-import {PIXEL_PER_MINUTES, dateFromTop} from "../model/helpers.ts";
+import {PIXEL_PER_MINUTES} from "../model/helpers.ts";
 
 type Props = {
     block: PositionedTimeBlock
@@ -14,8 +14,12 @@ export function TimeBlock({block, interactions}: Props) {
     const inputRef = useRef<HTMLInputElement>(null)
     const isEditing = block.isNew || block.title === ''
 
-    const displayStart = dateFromTop(block.startAt, block.top)
-    const displayEnd = new Date(displayStart.getTime() + block.height * 60 * 1000)
+    const segment = block.segment
+    const source = block.sourceBlock
+
+    const segmentClass =
+        segment === 'head' ? ' time-block--head' :
+        segment === 'tail' ? ' time-block--tail' : ''
 
     useEffect(() => {
         if (isEditing) {
@@ -46,12 +50,12 @@ export function TimeBlock({block, interactions}: Props) {
 
     return (
         <div
-            className="time-block"
+            className={`time-block${segmentClass}`}
             style={{
                 top: block.top,
-                height: block.height,
+                height: block.height - 2,
                 left: `${block.left}%`,
-                width: `${block.width}%`,
+                width: `calc(${block.width}% - 4px)`,
                 backgroundColor: block.color ?? '#d2e3fc',
                 zIndex: interactions.move.isDragging ? 100 : undefined,
                 opacity: interactions.move.isDragging ? 0.85 : undefined,
@@ -61,11 +65,12 @@ export function TimeBlock({block, interactions}: Props) {
                     e.stopPropagation()
                     return
                 }
+                if (segment === 'tail') return
                 interactions.move.start(e, block.id)
             }}
             onContextMenu={e =>  {
                 e.preventDefault()
-                interactions.menu.open(e.clientX, e.clientY, block)
+                interactions.menu.open(e.clientX, e.clientY, source)
             }}
         >
             {isEditing ? (
@@ -86,7 +91,7 @@ export function TimeBlock({block, interactions}: Props) {
 
             {block.height > PIXEL_PER_MINUTES * 30 && (
                 <div className="time-block__timeline">
-                    {formatTime(displayStart)} – {formatTime(displayEnd)}
+                    {formatTime(source.startAt)} – {formatTime(source.endAt)}
                 </div>
             )}
 
@@ -95,13 +100,15 @@ export function TimeBlock({block, interactions}: Props) {
                     {block.description}
                 </div>
             )}
-            <div
-                className="time-block__resize-handle"
-                onMouseDown={e => {
-                    e.stopPropagation()
-                    interactions.resize.start(e, block.id)
-                }}
-            />
+            {segment !== 'head' && (
+                <div
+                    className="time-block__resize-handle"
+                    onMouseDown={e => {
+                        e.stopPropagation()
+                        interactions.resize.start(e, block.id)
+                    }}
+                />
+            )}
         </div>
     )
 }
