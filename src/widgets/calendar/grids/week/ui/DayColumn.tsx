@@ -1,4 +1,5 @@
 import { CurrentTimeIndicator } from "../../../../../features/current-time-indicator/ui/CurrentTimeIndicator.tsx";
+import { useCurrentTime } from "../../../../../features/current-time-indicator/model/useCurrentTime.ts";
 import {TimeBlockList} from "../../../../../features/TimeBlock/ui/TimeBlockList.tsx";
 import type {TimeBlockInteractions, SegmentPosition, TimeBlock} from "../../../../../features/TimeBlock/model/types.ts";
 import {calculateDayLayout} from "../../../../../features/TimeBlock/lib/calculateDayLayout.ts";
@@ -42,7 +43,7 @@ export function DayColumn({ date, segments, interactions, moveHook }: Props) {
         })
     }
 
-    const now = new Date()
+    const now = useCurrentTime()
 
     const positioned = calculateDayLayout(segments)
 

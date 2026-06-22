@@ -1,61 +1,105 @@
 .time-block-menu {
     position: fixed;
     background: white;
-    border: 1px solid #ccc;
-    padding: 8px;
+    border: 1px solid #dadce0;
     z-index: 1000;
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+    width: 280px;
     font-family: sans-serif;
+    overflow: hidden;
+}
+
+.tb-menu-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 8px 8px;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.tb-menu-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #5f6368;
+    outline: none;
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    user-select: none;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.tb-menu-icon-btn:hover {
+    background: #f1f3f4;
+    color: #202124;
+}
+
+.tb-menu-icon-btn--danger:hover {
+    background: #fce8e6;
+    color: #c5221f;
+}
+
+.tb-menu-icon-btn--close {
+    margin-left: 4px;
 }
 
 .tb-menu-title {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 8px;
+    padding: 10px 12px 6px;
 }
 
 .tb-menu-title input {
-    flex: 1 1 70%;
-    padding: 4px 6px;
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
     font-size: 14px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
 }
 
-.tb-menu-confirm {
-    flex: 0 0 24px;
-    background: #34a853;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 2px;
+.tb-menu-title input:focus {
+    border-color: #4285f4;
 }
 
 .tb-menu-colors {
     display: flex;
-    gap: 4px;
-    margin-bottom: 8px;
+    gap: 6px;
+    padding: 6px 12px;
+}
+
+.tb-menu-colors + .tb-menu-colors {
+    padding-top: 0;
+    padding-bottom: 12px;
 }
 
 .tb-color-swatch {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 28px;
+    border-radius: 6px;
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    transition: border-color 0.15s, transform 0.1s;
+}
+
+.tb-color-swatch:hover {
+    transform: scale(1.1);
 }
 
 .tb-color-swatch.selected {
-    border: 2px solid #000;
-}
-
-.tb-menu-delete {
-    background: #ea4335;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 2px;
-    cursor: pointer;
-    width: 100%;
+    border-color: #202124;
 }
