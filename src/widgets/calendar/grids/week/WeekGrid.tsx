@@ -9,6 +9,8 @@ import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTim
 import {createTimeBlockRepository} from "../../../../features/TimeBlock/storage";
 import type {Period} from "../../../../features/TimeBlock/model/types.ts";
 import {useEffect, useMemo, useRef} from "react";
+import {useDragMove} from "../../../../features/TimeBlock/model/drag/useDragMove.ts";
+import {blockTop, dateFromTop} from "../../../../features/TimeBlock/model/helpers.ts";
 
 export function WeekGrid() {
     const { selectedDay } = useCalendar()
@@ -33,6 +35,21 @@ export function WeekGrid() {
         interactions,
         isLoading
     } = useTimeBlocksController({ repository, period })
+
+    const move = useDragMove({ onDrop: interactions.crud.updateBlockTime })
+
+    const MS_PER_DAY = 24 * 60 * 60 * 1000
+    const previewBlocks = move.dragInfo
+        ? blocks.map(b => {
+            if (b.id !== move.dragInfo!.blockId) return b
+            const duration = b.endAt.getTime() - b.startAt.getTime()
+            const newTop = blockTop(b.startAt) + move.dragInfo!.snappedDeltaY
+            const newStart = dateFromTop(b.startAt, newTop)
+            newStart.setTime(newStart.getTime() + move.dragInfo!.dayOffset * MS_PER_DAY)
+            const newEnd = new Date(newStart.getTime() + duration)
+            return { ...b, startAt: newStart, endAt: newEnd }
+        })
+        : blocks
 
     const days = useMemo(
         () =>
@@ -92,9 +109,10 @@ export function WeekGrid() {
                             <DayColumn
                                 key={day.toISOString()}
                                 date={day}
-                                blocks={getBlocksForDay(blocks, day)}
+                                blocks={getBlocksForDay(previewBlocks, day)}
                                 interactions={interactions}
-                            /> // отрефакторить в будущем (отфильтровать по дням блоки заранее
+                                moveHook={move}
+                            />
                         ))}
                     </div>
                 </div>

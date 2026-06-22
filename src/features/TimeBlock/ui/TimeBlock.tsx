@@ -2,7 +2,7 @@ import type {PositionedTimeBlock, TimeBlockInteractions} from '../model/types.ts
 import './TimeBlock.css'
 import React, {useRef, useState, useEffect} from "react";
 import {formatTime} from "../../../shared/lib/date/date.ts";
-import {PIXEL_PER_MINUTES} from "../model/helpers.ts";
+import {PIXEL_PER_MINUTES, dateFromTop} from "../model/helpers.ts";
 
 type Props = {
     block: PositionedTimeBlock
@@ -13,6 +13,9 @@ export function TimeBlock({block, interactions}: Props) {
     const [title, setTitle] = useState(block.title)
     const inputRef = useRef<HTMLInputElement>(null)
     const isEditing = block.isNew || block.title === ''
+
+    const displayStart = dateFromTop(block.startAt, block.top)
+    const displayEnd = new Date(displayStart.getTime() + block.height * 60 * 1000)
 
     useEffect(() => {
         if (isEditing) {
@@ -50,8 +53,8 @@ export function TimeBlock({block, interactions}: Props) {
                 left: `${block.left}%`,
                 width: `${block.width}%`,
                 backgroundColor: block.color ?? '#d2e3fc',
-                transform: interactions.move.deltaX ? `translateX(${interactions.move.deltaX}px)` : undefined,
-                zIndex: interactions.move.deltaX ? 100 : undefined,
+                zIndex: interactions.move.isDragging ? 100 : undefined,
+                opacity: interactions.move.isDragging ? 0.85 : undefined,
             }}
             onMouseDown={e => {
                 if (isEditing) {
@@ -81,9 +84,9 @@ export function TimeBlock({block, interactions}: Props) {
                 </div>
             )}
 
-            {block.startAt && block.endAt && block.height > PIXEL_PER_MINUTES * 30 && (
+            {block.height > PIXEL_PER_MINUTES * 30 && (
                 <div className="time-block__timeline">
-                    {formatTime(block.startAt)} – {formatTime(block.endAt)}
+                    {formatTime(displayStart)} – {formatTime(displayEnd)}
                 </div>
             )}
 

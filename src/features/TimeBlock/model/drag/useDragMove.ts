@@ -88,5 +88,11 @@ export function useDragMove({ onDrop }: Params) {
         }
     }
 
-    return { bindMove }
+    const dragInfo = drag ? {
+        blockId: drag.block.id,
+        dayOffset: Math.round(deltaX / drag.columnWidth),
+        snappedDeltaY,
+    } : null
+
+    return { bindMove, dragInfo }
 }

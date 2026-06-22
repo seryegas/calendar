@@ -25,4 +25,6 @@ dist-ssr
 .env
 .env.dev
 CLAUDE.MD
+.claude
+frontend-dev.md
 .claudeignore

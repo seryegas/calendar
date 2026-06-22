@@ -3,15 +3,17 @@ import {TimeBlockList} from "../../../../../features/TimeBlock/ui/TimeBlockList.
 import type {TimeBlock, TimeBlockInteractions} from "../../../../../features/TimeBlock/model/types.ts";
 import {calculateDayLayout} from "../../../../../features/TimeBlock/lib/calculateDayLayout.ts";
 import {dateFromTop} from "../../../../../features/TimeBlock/model/helpers.ts";
+import type {useDragMove} from "../../../../../features/TimeBlock/model/drag/useDragMove.ts";
 import React from "react";
 
 type Props = {
     date: Date,
     blocks: TimeBlock[]
     interactions: TimeBlockInteractions
+    moveHook: ReturnType<typeof useDragMove>
 }
 
-export function DayColumn({ date, blocks, interactions }: Props) {
+export function DayColumn({ date, blocks, interactions, moveHook }: Props) {
     function handleDayClick(
         e: React.MouseEvent<HTMLDivElement>
     ) {
@@ -40,13 +42,7 @@ export function DayColumn({ date, blocks, interactions }: Props) {
 
     const now = new Date()
 
-    const dayBlocks = blocks.filter(
-        b =>
-            b.startAt.toDateString() ===
-            date.toDateString()
-    )
-
-    const positioned = calculateDayLayout(dayBlocks)
+    const positioned = calculateDayLayout(blocks)
 
     const isToday =
         date.getFullYear() === now.getFullYear() &&
@@ -59,6 +55,7 @@ export function DayColumn({ date, blocks, interactions }: Props) {
 
             <TimeBlockList blocks={positioned}
                            interactions={interactions}
+                           moveHook={moveHook}
             />
 
             {Array.from({ length: 24 }).map((_, h) => (

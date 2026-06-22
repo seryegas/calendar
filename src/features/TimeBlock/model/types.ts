@@ -29,6 +29,7 @@ export type TimeBlockInteractions = {
     move: {
         start: (e: React.MouseEvent, blockId: string) => void
         deltaX: number
+        isDragging?: boolean
     }
 
     resize: {
