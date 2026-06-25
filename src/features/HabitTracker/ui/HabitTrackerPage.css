@@ -1,0 +1,278 @@
+.ht-page {
+  display: flex;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #fff;
+}
+
+/* ===== MONTHS SIDEBAR ===== */
+
+.ht-page-months {
+  width: 120px;
+  flex-shrink: 0;
+  border-right: 1px solid #e8eaed;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0 8px;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+/* ===== YEAR SELECTOR ===== */
+
+.ht-year-selector {
+  position: relative;
+  padding: 0 8px 6px;
+}
+
+.ht-year-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #202124;
+  transition: background 0.12s;
+  box-sizing: border-box;
+}
+
+.ht-year-btn:hover,
+.ht-year-btn--open {
+  background: #f1f3f4;
+}
+
+.ht-year-chevron {
+  color: #5f6368;
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.ht-year-chevron--up {
+  transform: rotate(180deg);
+}
+
+.ht-year-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 8px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.ht-year-option {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 400;
+  color: #202124;
+  text-align: left;
+  transition: background 0.1s;
+  box-sizing: border-box;
+}
+
+.ht-year-option:hover {
+  background: #f1f3f4;
+}
+
+.ht-year-option--active {
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+/* divider between year selector and month list */
+.ht-page-months > .ht-year-selector {
+  border-bottom: 1px solid #e8eaed;
+  margin-bottom: 6px;
+  padding-bottom: 10px;
+}
+
+.ht-page-months-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0a6;
+  padding: 0 16px 10px;
+}
+
+.ht-page-month-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px 8px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #5f6368;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.ht-page-month-btn:hover {
+  background: #f1f3f4;
+  color: #202124;
+}
+
+.ht-page-month-btn--active {
+  color: #1a73e8;
+  border-left-color: #1a73e8;
+  font-weight: 500;
+}
+
+/* ===== MAIN AREA ===== */
+
+.ht-page-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ht-page-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid #e8eaed;
+  flex-shrink: 0;
+}
+
+.ht-page-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.ht-habits-list-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  background: none;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  color: #5f6368;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+
+.ht-habits-list-btn:hover {
+  background: #f1f3f4;
+  border-color: #bdc1c6;
+  color: #202124;
+}
+
+
+/* ===== TABLE ===== */
+
+.ht-page-table-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+.ht-page-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: inherit;
+  min-width: 100%;
+}
+
+.ht-page-th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5f6368;
+  border-bottom: 2px solid #e8eaed;
+  white-space: nowrap;
+}
+
+.ht-page-date-th {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #fff;
+  width: 90px;
+  min-width: 90px;
+}
+
+.ht-page-date-td {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 1;
+  padding: 0 16px;
+  height: 40px;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ht-page-date-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ht-page-day-name {
+  font-size: 11px;
+  color: #9aa0a6;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.ht-page-day-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: #202124;
+  min-width: 18px;
+}
+
+.ht-page-check-td {
+  text-align: center;
+  height: 40px;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 4px;
+  vertical-align: middle;
+  color: #34a853;
+  min-width: 80px;
+}
+
+.ht-page-check-td--done {
+  background: rgba(52, 168, 83, 0.05);
+}

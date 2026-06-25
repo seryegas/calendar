@@ -1,8 +1,8 @@
 import {usePeriodNavigation} from "../../../features/Calendar/model/usePeriodNavigation.ts";
-import {useCalendar} from "../../../app/providers/CalendarProvider.tsx";
+import { useApp } from "../../../app/providers/CalendarProvider.tsx";
 
 export function Navigation() {
-    const {view} = useCalendar()
+    const { view } = useApp()
     const {goPrev, goToToday, goNext} = usePeriodNavigation(view)
 
     return (

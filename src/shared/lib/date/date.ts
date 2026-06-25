@@ -1,4 +1,4 @@
-import type {CalendarView} from "../../../app/providers/CalendarProvider.tsx";
+import type { CalendarView } from "../../../app/providers/applicationTypes.ts";
 
 export function startOfWeek(date: Date): Date {
     const d = new Date(date)

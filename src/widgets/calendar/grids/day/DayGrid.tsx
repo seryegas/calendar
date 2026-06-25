@@ -1,7 +1,7 @@
 import './DayGrid.css'
 import {DayHeader} from "../week/ui/DayHeader.tsx";
 import {DayColumn} from "../week/ui/DayColumn.tsx";
-import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
+import { useApp } from "../../../../app/providers/CalendarProvider.tsx";
 import {getSegmentsForDay} from "../../../../features/TimeBlock/model/selectors.ts";
 import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx";
 import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTimeBlockController.ts";
@@ -12,7 +12,7 @@ import {useDragMove} from "../../../../features/TimeBlock/model/drag/useDragMove
 import {blockTop, dateFromTop} from "../../../../features/TimeBlock/model/helpers.ts";
 
 export function DayGrid() {
-    const { selectedDay } = useCalendar()
+    const { selectedDay } = useApp()
     const dayStart = useMemo(() => {
         const d = new Date(selectedDay)
         d.setHours(0, 0, 0, 0)

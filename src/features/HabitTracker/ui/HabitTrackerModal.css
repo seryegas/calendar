@@ -1,0 +1,194 @@
+.ht-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ht-panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  width: 860px;
+  max-width: calc(100vw - 48px);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===== HEADER ===== */
+
+.ht-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8eaed;
+  flex-shrink: 0;
+}
+
+.ht-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.ht-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #5f6368;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.ht-close-btn:hover {
+  background: #f1f3f4;
+  color: #202124;
+}
+
+/* ===== BODY ===== */
+
+.ht-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== MONTHS SIDEBAR ===== */
+
+.ht-months {
+  width: 108px;
+  flex-shrink: 0;
+  border-right: 1px solid #e8eaed;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.ht-month-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px 8px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #5f6368;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.ht-month-btn:hover {
+  background: #f1f3f4;
+  color: #202124;
+}
+
+.ht-month-btn--active {
+  color: #1a73e8;
+  border-left-color: #1a73e8;
+  font-weight: 500;
+}
+
+/* ===== TABLE ===== */
+
+.ht-table-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+.ht-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.ht-th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6368;
+  border-bottom: 2px solid #e8eaed;
+  white-space: nowrap;
+}
+
+.ht-date-th {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  width: 80px;
+  min-width: 80px;
+  background: #fff;
+}
+
+.ht-date-td {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 1;
+  padding: 0 12px;
+  height: 36px;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ht-date-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ht-day-name {
+  font-size: 11px;
+  color: #9aa0a6;
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.ht-day-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: #202124;
+  min-width: 16px;
+}
+
+.ht-check-td {
+  text-align: center;
+  height: 36px;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 4px;
+  vertical-align: middle;
+  color: #34a853;
+  min-width: 60px;
+}
+
+.ht-check-td--done {
+  background: rgba(52, 168, 83, 0.05);
+}

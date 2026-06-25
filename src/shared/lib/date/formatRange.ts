@@ -1,4 +1,4 @@
-import type {CalendarView} from "../../../app/providers/CalendarProvider.tsx";
+import type { CalendarView } from "../../../app/providers/applicationTypes.ts";
 
 export function formatRange(startDate: Date, view: CalendarView = 'week'): string {
     const start = new Date(startDate)

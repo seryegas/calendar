@@ -1,4 +1,4 @@
-import type {CalendarView} from "../../../app/providers/CalendarProvider.tsx";
+import type { CalendarView } from "../../../app/providers/applicationTypes.ts";
 import type {PeriodNavigator} from "./navigarors/types.ts";
 import {useWeekNavigator} from "./navigarors/useWeekNavigator.ts";
 

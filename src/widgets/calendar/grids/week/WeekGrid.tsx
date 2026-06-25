@@ -2,7 +2,7 @@ import './ui/WeekGrid.css'
 import {DayHeader} from "./ui/DayHeader.tsx";
 import {DayColumn} from "./ui/DayColumn.tsx";
 import {startOfWeek} from "../../../../shared/lib/date/date.ts";
-import {useCalendar} from "../../../../app/providers/CalendarProvider.tsx";
+import { useApp } from "../../../../app/providers/CalendarProvider.tsx";
 import {getSegmentsForDay} from "../../../../features/TimeBlock/model/selectors.ts";
 import {TimeBlockMenu} from "../../../../features/TimeBlock/ui/TimeBlockMenu.tsx";
 import {useTimeBlocksController} from "../../../../features/TimeBlock/api/useTimeBlockController.ts";
@@ -13,7 +13,7 @@ import {useDragMove} from "../../../../features/TimeBlock/model/drag/useDragMove
 import {blockTop, dateFromTop} from "../../../../features/TimeBlock/model/helpers.ts";
 
 export function WeekGrid() {
-    const { selectedDay } = useCalendar()
+    const { selectedDay } = useApp()
     const weekStart = useMemo(
         () => startOfWeek(selectedDay),
         [selectedDay]

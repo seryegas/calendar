@@ -1,9 +1,10 @@
 import "./ViewSwitcher.css"
-import {CALENDAR_VIEWS, type CalendarView, useCalendar} from "../../../app/providers/CalendarProvider.tsx";
+import { CALENDAR_VIEWS, type CalendarView } from "../../../app/providers/applicationTypes.ts";
+import { useApp } from "../../../app/providers/CalendarProvider.tsx";
 import {getPeriodStartDate} from "../../../shared/lib/date/date.ts";
 
 export function ViewSwitcher() {
-    const { view, setView, selectedDay, setSelectedDay } = useCalendar()
+    const { view, setView, selectedDay, setSelectedDay } = useApp()
 
     const handleChange = (view: CalendarView) => {
         if (view === 'month' || view === 'year') return

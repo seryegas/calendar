@@ -1,5 +1,5 @@
 import React from "react";
-import type {CalendarView} from "../../../app/providers/CalendarProvider.tsx";
+import type { CalendarView } from "../../../app/providers/applicationTypes.ts";
 
 export type TimeBlockId = string
 

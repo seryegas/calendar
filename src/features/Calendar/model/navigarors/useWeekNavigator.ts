@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import type { PeriodNavigator } from './types.ts'
-import { useCalendar } from '../../../../app/providers/CalendarProvider.tsx'
+import { useApp } from '../../../../app/providers/CalendarProvider.tsx'
 
 export function useWeekNavigator(): PeriodNavigator {
-    const { selectedDay, setSelectedDay } = useCalendar()
+    const { selectedDay, setSelectedDay } = useApp()
 
     const goNext = useCallback(() => {
         const next = new Date(selectedDay)
