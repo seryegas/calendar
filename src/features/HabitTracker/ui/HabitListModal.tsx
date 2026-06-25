@@ -1,22 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
+import { HabitFilterStatus } from '../model/types'
+import type { HabitDto } from '../model/types'
+import { fetchHabits, createHabit, updateHabit, deleteHabit } from '../storage/habitApi'
 import './HabitListModal.css'
 
-type FilterOption = 'all' | 'active' | 'inactive'
-
-const FILTER_OPTIONS: { id: FilterOption; label: string }[] = [
-  { id: 'all', label: 'Все' },
-  { id: 'active', label: 'Активные' },
-  { id: 'inactive', label: 'Неактивные' },
-]
-
-type HabitItem = { id: string; name: string; isActive: boolean }
-
-const MOCK_HABITS: HabitItem[] = [
-  { id: 'reading', name: 'Чтение', isActive: true },
-  { id: 'sport', name: 'Спорт', isActive: true },
-  { id: 'meditation', name: 'Медитация', isActive: false },
-  { id: 'water', name: 'Вода 2л', isActive: true },
-  { id: 'no-sugar', name: 'Без сахара', isActive: true },
+const FILTER_OPTIONS: { id: HabitFilterStatus; label: string }[] = [
+  { id: HabitFilterStatus.All, label: 'Все' },
+  { id: HabitFilterStatus.Active, label: 'Активные' },
+  { id: HabitFilterStatus.Inactive, label: 'Неактивные' },
 ]
 
 const LIMIT = 10
@@ -95,16 +86,40 @@ function HabitFormModal({
 type Props = { onClose: () => void }
 
 export function HabitListModal({ onClose }: Props) {
-  const [habits, setHabits] = useState<HabitItem[]>(MOCK_HABITS)
+  const [habits, setHabits] = useState<HabitDto[]>([])
+  const [total, setTotal] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
+
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<FilterOption>('all')
+  const [filter, setFilter] = useState<HabitFilterStatus>(HabitFilterStatus.All)
   const [filterOpen, setFilterOpen] = useState(false)
   const [page, setPage] = useState(1)
 
-  type FormMode = { mode: 'add' } | { mode: 'edit'; habit: HabitItem } | null
+  type FormMode = { mode: 'add' } | { mode: 'edit'; habit: HabitDto } | null
   const [formMode, setFormMode] = useState<FormMode>(null)
 
   const filterRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setIsLoading(true)
+    setError(null)
+    fetchHabits({ page, limit: LIMIT, search, filter })
+      .then(res => {
+        if (cancelled) return
+        setHabits(res.data)
+        setTotal(res.total)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Не удалось загрузить привычки')
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [page, search, filter, reloadKey])
 
   useEffect(() => {
     if (!filterOpen) return
@@ -125,28 +140,34 @@ export function HabitListModal({ onClose }: Props) {
     return () => window.removeEventListener('keydown', handler)
   }, [formMode, onClose])
 
-  const filtered = habits.filter(h => {
-    const matchSearch = h.name.toLowerCase().includes(search.toLowerCase())
-    const matchFilter =
-      filter === 'all' || (filter === 'active' ? h.isActive : !h.isActive)
-    return matchSearch && matchFilter
-  })
-
-  const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / LIMIT))
-  const pageItems = filtered.slice((page - 1) * LIMIT, page * LIMIT)
 
-  function handleAdd(name: string, isActive: boolean) {
-    setHabits(prev => [...prev, { id: crypto.randomUUID(), name, isActive }])
-    setFormMode(null)
+  function reload() {
+    setReloadKey(k => k + 1)
   }
 
-  function handleSaveEdit(name: string, isActive: boolean) {
-    if (formMode?.mode !== 'edit') return
-    setHabits(prev =>
-      prev.map(h => h.id === formMode.habit.id ? { ...h, name, isActive } : h)
-    )
+  async function handleAdd(name: string, isActive: boolean) {
+    await createHabit(name, isActive)
     setFormMode(null)
+    setPage(1)
+    reload()
+  }
+
+  async function handleSaveEdit(name: string, isActive: boolean) {
+    if (formMode?.mode !== 'edit') return
+    await updateHabit(formMode.habit.id, name, isActive)
+    setFormMode(null)
+    reload()
+  }
+
+  async function handleDelete(id: number) {
+    setHabits(prev => prev.filter(h => h.id !== id))
+    setTotal(prev => prev - 1)
+    try {
+      await deleteHabit(id)
+    } catch {
+      reload()
+    }
   }
 
   const currentFilterLabel = FILTER_OPTIONS.find(f => f.id === filter)?.label ?? 'Все'
@@ -214,17 +235,21 @@ export function HabitListModal({ onClose }: Props) {
           </div>
 
           <div className="hlm-list">
-            {pageItems.length === 0 ? (
+            {isLoading ? (
+              <div className="hlm-empty">Загрузка...</div>
+            ) : error ? (
+              <div className="hlm-empty hlm-empty--error">{error}</div>
+            ) : habits.length === 0 ? (
               <div className="hlm-empty">Привычки не найдены</div>
             ) : (
-              pageItems.map(h => (
+              habits.map(h => (
                 <div key={h.id} className="hlm-item-wrap">
                   <div className="hlm-item">
-                    <span className="hlm-item-name">{h.name}</span>
+                    <span className="hlm-item-name">{h.label}</span>
                     <div className="hlm-item-right">
                       <span
-                        className={`hlm-status-dot hlm-status-dot--${h.isActive ? 'active' : 'inactive'}`}
-                        title={h.isActive ? 'Активна' : 'Неактивна'}
+                        className={`hlm-status-dot hlm-status-dot--${h.is_active ? 'active' : 'inactive'}`}
+                        title={h.is_active ? 'Активна' : 'Неактивна'}
                       />
                       <button
                         className="hlm-edit-btn"
@@ -234,6 +259,19 @@ export function HabitListModal({ onClose }: Props) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
                           <path d="m15 5 4 4"/>
+                        </svg>
+                      </button>
+                      <button
+                        className="hlm-delete-btn"
+                        title="Удалить"
+                        onClick={() => handleDelete(h.id)}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/>
+                          <path d="M14 11v6"/>
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                         </svg>
                       </button>
                     </div>
@@ -261,7 +299,6 @@ export function HabitListModal({ onClose }: Props) {
         </div>
       </div>
 
-      {/* Form modal rendered on top */}
       {formMode?.mode === 'add' && (
         <HabitFormModal
           title="Новая привычка"
@@ -274,8 +311,8 @@ export function HabitListModal({ onClose }: Props) {
       {formMode?.mode === 'edit' && (
         <HabitFormModal
           title="Редактировать привычку"
-          initialName={formMode.habit.name}
-          initialActive={formMode.habit.isActive}
+          initialName={formMode.habit.label}
+          initialActive={formMode.habit.is_active}
           onSave={handleSaveEdit}
           onClose={() => setFormMode(null)}
         />

@@ -413,6 +413,25 @@
   color: #1a73e8;
 }
 
+.hlm-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #5f6368;
+  transition: background 0.12s, color 0.12s;
+}
+
+.hlm-delete-btn:hover {
+  background: #f1f3f4;
+  color: #202124;
+}
+
 /* ===== EDIT PANEL ===== */
 
 .hlm-edit-panel {
@@ -513,6 +532,19 @@
 
 .hlm-edit-save:hover {
   background: #1765cc;
+}
+
+/* ===== EMPTY / LOADING STATES ===== */
+
+.hlm-empty {
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #9aa0a6;
+}
+
+.hlm-empty--error {
+  color: #d93025;
 }
 
 /* ===== PAGINATION ===== */

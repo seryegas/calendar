@@ -187,8 +187,71 @@
   vertical-align: middle;
   color: #34a853;
   min-width: 60px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.ht-check-td:hover {
+  background: #f8f9fa;
 }
 
 .ht-check-td--done {
-  background: rgba(52, 168, 83, 0.05);
+  background: rgba(52, 168, 83, 0.06);
+}
+
+.ht-check-td--done:hover {
+  background: rgba(52, 168, 83, 0.12);
+}
+
+/* ===== EMPTY STATE ===== */
+
+.ht-empty {
+  padding: 48px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #9aa0a6;
+}
+
+/* ===== SAVE STATUS BAR ===== */
+
+.ht-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 24px;
+  border-top: 1px solid #e8eaed;
+  flex-shrink: 0;
+  background: #f8f9fa;
+  min-height: 38px;
+}
+
+.ht-save-bar__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #5f6368;
+}
+
+.ht-save-bar__text--saved {
+  color: #34a853;
+}
+
+.ht-save-bar__now {
+  margin-left: 8px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #1a73e8;
+  background: none;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.ht-save-bar__now:hover {
+  background: #e8f0fe;
 }
