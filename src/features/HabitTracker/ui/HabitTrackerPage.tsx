@@ -135,8 +135,7 @@ export function HabitTrackerPage() {
   }, [])
 
   function startFlushTimer() {
-    if (flushTimerRef.current) clearTimeout(flushTimerRef.current)
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
+    if (flushTimerRef.current) return
 
     flushTimerRef.current = setTimeout(flushBuffer, FLUSH_DELAY)
 
@@ -206,6 +205,7 @@ export function HabitTrackerPage() {
   const [year, month] = selectedMonth.split('-').map(Number)
   const daysInMonth = new Date(year, month, 0).getDate()
   const isCurrentMonth = year === CURRENT_YEAR && month === CURRENT_MONTH
+  const isPastMonth = year < CURRENT_YEAR || (year === CURRENT_YEAR && month < CURRENT_MONTH)
   const todayDay = now.getDate()
 
   const days = Array.from({ length: daysInMonth }, (_, i) => {
@@ -213,7 +213,9 @@ export function HabitTrackerPage() {
     const date = `${selectedMonth}-${String(day).padStart(2, '0')}`
     const dayOfWeek = new Date(year, month - 1, day).getDay()
     const disabled = isCurrentMonth && day > todayDay
-    return { day, date, dayName: DAY_NAMES[dayOfWeek], disabled }
+    const isToday = isCurrentMonth && day === todayDay
+    const isPast = isPastMonth || (isCurrentMonth && day < todayDay)
+    return { day, date, dayName: DAY_NAMES[dayOfWeek], disabled, isToday, isPast }
   })
 
   const monthLabel = months.find(m => m.key === selectedMonth)?.label ?? ''
@@ -312,7 +314,7 @@ export function HabitTrackerPage() {
                 </tr>
               </thead>
               <tbody>
-                {days.map(({ day, date, dayName, disabled }) => (
+                {days.map(({ day, date, dayName, disabled, isPast }) => (
                   <tr key={date} className={disabled ? 'ht-page-row--disabled' : ''}>
                     <td className="ht-page-date-td">
                       <div className="ht-page-date-inner">
@@ -322,15 +324,22 @@ export function HabitTrackerPage() {
                     </td>
                     {habits.map(h => {
                       const done = !disabled && doneKeys.has(`${h.id}:${date}`)
+                      const missed = isPast && !done
                       return (
                         <td
                           key={h.id}
-                          className={`ht-page-check-td${done ? ' ht-page-check-td--done' : ''}`}
+                          className={`ht-page-check-td${done ? ' ht-page-check-td--done' : ''}${missed ? ' ht-page-check-td--missed' : ''}`}
                           onClick={disabled ? undefined : () => handleToggle(h.id, date)}
                         >
                           {done && (
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          )}
+                          {missed && (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="18" y1="6" x2="6" y2="18"/>
+                              <line x1="6" y1="6" x2="18" y2="18"/>
                             </svg>
                           )}
                         </td>

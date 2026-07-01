@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type JSX } from 'react'
 import { formatRange } from "../../shared/lib/date/formatRange.ts"
 import { ViewSwitcher } from "./ui/ViewSwitcher.tsx"
 import "./ui/Header.css"

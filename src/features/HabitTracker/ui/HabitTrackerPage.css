@@ -337,11 +337,29 @@
 }
 
 .ht-page-check-td--done {
-  background: rgba(52, 168, 83, 0.05);
+  background: rgba(52, 168, 83, 0.3);
 }
 
 .ht-page-check-td--done:hover {
-  background: rgba(52, 168, 83, 0.12);
+  background: rgba(52, 168, 83, 0.4);
+}
+
+.ht-page-check-td--missed {
+  background: rgba(234, 67, 53, 0.26);
+  color: #ea4335;
+}
+
+.ht-page-check-td--missed:hover {
+  background: rgba(234, 67, 53, 0.38);
+}
+
+tr:has(.ht-page-check-td:hover) .ht-page-date-td {
+  background: #e8eaed;
+}
+
+tr:has(.ht-page-check-td:hover) .ht-page-day-name,
+tr:has(.ht-page-check-td:hover) .ht-page-day-num {
+  color: #202124;
 }
 
 /* ===== TOTAL ROW ===== */
