@@ -67,7 +67,7 @@ export function TransactionsListModal({
   }
 
   const amountNum = parseFloat(draft.amount.replace(',', '.'))
-  const draftValid = draft.date && amountNum > 0
+  const draftValid = !!draft.date && amountNum > 0
 
   async function saveDraft() {
     if (!draftValid) return
