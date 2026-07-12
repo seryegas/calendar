@@ -11,13 +11,14 @@ import {useEffect, useMemo, useRef} from "react";
 import {useDragMove} from "../../../../features/TimeBlock/model/drag/useDragMove.ts";
 import {blockTop, dateFromTop} from "../../../../features/TimeBlock/model/helpers.ts";
 
-export function DayGrid() {
+export function DayGrid({ date }: { date?: Date } = {}) {
     const { selectedDay } = useApp()
+    const source = date ?? selectedDay
     const dayStart = useMemo(() => {
-        const d = new Date(selectedDay)
+        const d = new Date(source)
         d.setHours(0, 0, 0, 0)
         return d
-    }, [selectedDay])
+    }, [source])
 
     const scrollRef = useRef<HTMLDivElement>(null)
     const repository = useMemo(

@@ -31,7 +31,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const [appSection, setAppSectionState] = useState<AppSection>(() => {
         const saved = localStorage.getItem(LS_KEYS.appSection)
-        return (saved as AppSection) || 'calendar'
+        return (saved as AppSection) || 'dashboard'
     })
 
     const [selectedDay, setSelectedDayState] = useState<Date>(() => {
