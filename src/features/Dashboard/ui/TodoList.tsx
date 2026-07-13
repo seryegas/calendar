@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react'
-import type { Task } from '../../Tasks/model/types'
+import type { Task, TaskInput, TaskList } from '../../Tasks/model/types'
 import { priorityMeta } from '../../Tasks/model/types'
-import { fetchTasks, setTaskDone } from '../../Tasks/storage/taskApi'
+import { fetchTasks, fetchLists, createTask, setTaskDone } from '../../Tasks/storage/taskApi'
+import { TaskFormModal } from '../../Tasks/ui/TaskFormModal'
 
 const LIMIT = 10
 
 export function TodoList() {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [lists, setLists] = useState<TaskList[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [reloadTick, setReloadTick] = useState(0)
+  const [addOpen, setAddOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(false)
-    fetchTasks({ status: 'active', limit: LIMIT })
-      .then(data => { if (!cancelled) setTasks(data) })
+    Promise.all([
+      fetchTasks({ status: 'active', limit: LIMIT }),
+      fetchLists(),
+    ])
+      .then(([t, l]) => { if (!cancelled) { setTasks(t); setLists(l) } })
       .catch(() => { if (!cancelled) setError(true) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [])
+  }, [reloadTick])
 
   async function complete(task: Task) {
     // закрытая задача уходит из активного списка
@@ -31,11 +38,27 @@ export function TodoList() {
     }
   }
 
+  async function handleAdd(input: TaskInput) {
+    await createTask(input)
+    setAddOpen(false)
+    setReloadTick(t => t + 1)
+  }
+
   return (
     <div className="dash-widget dash-todo">
       <div className="dash-widget-head">
         <span className="dash-widget-title">Текущие дела</span>
-        <span className="dash-habits-counter">{tasks.length}</span>
+        <div className="dash-widget-head-right">
+          <span className="dash-habits-counter">{tasks.length}</span>
+          <button
+            className="dash-add-btn"
+            title="Новая задача"
+            disabled={lists.length === 0}
+            onClick={() => setAddOpen(true)}
+          >
+            +
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -58,6 +81,16 @@ export function TodoList() {
             )
           })}
         </ul>
+      )}
+
+      {addOpen && lists.length > 0 && (
+        <TaskFormModal
+          title="Новая задача"
+          lists={lists}
+          defaultListId={lists[0].id}
+          onSave={handleAdd}
+          onClose={() => setAddOpen(false)}
+        />
       )}
     </div>
   )

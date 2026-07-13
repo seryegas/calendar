@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, type KeyboardEvent } from 'react'
 import type { BudgetKind } from '../model/types'
 import type { Transaction } from '../model/transaction'
 import type { TxFilter } from '../storage/budgetApi'
@@ -176,6 +176,9 @@ function EditRow({
   onSave: () => void
   onCancel: () => void
 }) {
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' && valid) onSave()
+  }
   return (
     <div className="bg-list-row bg-list-row--edit">
       <input
@@ -183,13 +186,16 @@ function EditRow({
         className="bg-input bg-input--sm bg-edit-date"
         value={draft.date}
         onChange={e => setDraft({ ...draft, date: e.target.value })}
+        onKeyDown={onKeyDown}
       />
       <input
         type="text"
         className="bg-input bg-input--sm bg-edit-note"
         placeholder="Описание"
         value={draft.note}
+        autoFocus
         onChange={e => setDraft({ ...draft, note: e.target.value })}
+        onKeyDown={onKeyDown}
       />
       <input
         type="number"
@@ -198,8 +204,8 @@ function EditRow({
         value={draft.amount}
         min="0"
         step="0.01"
-        autoFocus
         onChange={e => setDraft({ ...draft, amount: e.target.value })}
+        onKeyDown={onKeyDown}
       />
       <span className="bg-list-actions">
         <button className="bg-icon-btn bg-icon-btn--ok" title="Сохранить" onClick={onSave} disabled={!valid}>✓</button>

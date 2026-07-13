@@ -86,6 +86,35 @@
   color: #1f2328;
 }
 
+.dash-widget-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-add-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 7px;
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+  transition: background 0.12s;
+}
+
+.dash-add-btn:hover {
+  background: #d7e6fd;
+}
+
+.dash-add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .dash-widget-empty {
   color: #9aa0a6;
   font-size: 13px;

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { categoriesOf } from '../../Budget/model/types'
 import type { BudgetCategory } from '../../Budget/model/types'
-import { fetchSummary } from '../../Budget/storage/budgetApi'
+import type { NewTransaction } from '../../Budget/model/transaction'
+import { fetchSummary, createTransaction } from '../../Budget/storage/budgetApi'
+import { AddTransactionModal } from '../../Budget/ui/AddTransactionModal'
 
 type Props = {
   year: number
@@ -18,6 +20,8 @@ export function MonthlyDonuts({ year, month }: Props) {
   const [incomeVals, setIncomeVals] = useState<number[]>([])
   const [expenseVals, setExpenseVals] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
+  const [addOpen, setAddOpen] = useState(false)
+  const [reloadTick, setReloadTick] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -31,12 +35,25 @@ export function MonthlyDonuts({ year, month }: Props) {
       .catch(() => { if (!cancelled) { setIncomeVals([]); setExpenseVals([]) } })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [year, month])
+  }, [year, month, reloadTick])
+
+  async function handleAdd(tx: NewTransaction) {
+    await createTransaction(tx)
+    setAddOpen(false)
+    setReloadTick(t => t + 1)
+  }
 
   return (
     <div className="dash-widget dash-budget">
       <div className="dash-widget-head">
         <span className="dash-widget-title">Бюджет за месяц</span>
+        <button
+          className="dash-add-btn"
+          title="Новая затрата"
+          onClick={() => setAddOpen(true)}
+        >
+          +
+        </button>
       </div>
       {loading ? (
         <div className="dash-widget-empty">Загрузка…</div>
@@ -45,6 +62,14 @@ export function MonthlyDonuts({ year, month }: Props) {
           <SemiDonut title="Доходы" categories={categoriesOf('income')} values={incomeVals} />
           <SemiDonut title="Расходы" categories={categoriesOf('expense')} values={expenseVals} />
         </div>
+      )}
+
+      {addOpen && (
+        <AddTransactionModal
+          defaultKind="expense"
+          onClose={() => setAddOpen(false)}
+          onSave={handleAdd}
+        />
       )}
     </div>
   )
