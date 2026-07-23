@@ -14,6 +14,7 @@ function taskFromDto(d: TaskDto): Task {
   return {
     id: d.id,
     listId: d.list_id,
+    parentId: d.parent_id ?? null,
     title: d.title,
     description: d.description || undefined,
     priority: d.priority,
@@ -26,6 +27,7 @@ function taskFromDto(d: TaskDto): Task {
 function taskToPayload(t: TaskInput) {
   return {
     list_id: t.listId,
+    parent_id: t.parentId ?? null,
     title: t.title,
     description: t.description ?? '',
     priority: t.priority,

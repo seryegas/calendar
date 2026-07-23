@@ -27,6 +27,7 @@ export interface TaskList {
 export interface Task {
   id: number
   listId: number
+  parentId: number | null // null => корневая задача
   title: string
   description?: string
   priority: Priority
@@ -38,6 +39,9 @@ export interface Task {
 // поля для создания/редактирования (без id/done)
 export type TaskInput = Omit<Task, 'id' | 'done'>
 
+// максимальная глубина вложенности подзадач (корень = 0)
+export const MAX_TASK_DEPTH = 8
+
 // ===== DTO (снейк-кейс с бэкенда) =====
 export interface TaskListDto {
   id: number
@@ -48,6 +52,7 @@ export interface TaskListDto {
 export interface TaskDto {
   id: number
   list_id: number
+  parent_id?: number | null
   title: string
   description?: string | null
   priority: Priority

@@ -8,6 +8,7 @@ export function TaskFormModal({
   lists,
   defaultListId,
   initial,
+  parentId = null,
   onSave,
   onClose,
 }: {
@@ -15,6 +16,7 @@ export function TaskFormModal({
   lists: TaskList[]
   defaultListId: number
   initial?: Task
+  parentId?: number | null // задан => создаём подзадачу, список наследуется от родителя
   onSave: (input: TaskInput) => void
   onClose: () => void
 }) {
@@ -24,6 +26,9 @@ export function TaskFormModal({
   const [listId, setListId] = useState<number>(initial?.listId ?? defaultListId)
   const [dueDate, setDueDate] = useState(initial?.dueDate ?? '')
   const [deadline, setDeadline] = useState(initial?.deadline ?? '')
+
+  // подзадача наследует список родителя — селектор списка прячем
+  const isSubtask = (initial?.parentId ?? parentId) != null
 
   useEffect(() => {
     function handler(e: KeyboardEvent) {
@@ -39,6 +44,7 @@ export function TaskFormModal({
     if (!valid) return
     onSave({
       listId,
+      parentId: initial?.parentId ?? parentId,
       title: name.trim(),
       description: description.trim() || undefined,
       priority,
@@ -49,7 +55,17 @@ export function TaskFormModal({
 
   return (
     <div className="tk-modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="tk-modal" onMouseDown={e => e.stopPropagation()}>
+      <div
+        className="tk-modal"
+        onMouseDown={e => e.stopPropagation()}
+        onKeyDown={e => {
+          // Enter сохраняет; в описании (textarea) оставляем перенос строки
+          if (e.key === 'Enter' && !e.shiftKey && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+            e.preventDefault()
+            submit()
+          }
+        }}
+      >
         <div className="tk-modal-head">
           <span className="tk-modal-title">{title}</span>
           <button className="tk-modal-close" onClick={onClose}>×</button>
@@ -96,14 +112,16 @@ export function TaskFormModal({
             </div>
           </div>
 
-          <label className="tk-field">
-            <span className="tk-field-label">Список</span>
-            <select className="tk-input" value={listId} onChange={e => setListId(Number(e.target.value))}>
-              {lists.map(l => (
-                <option key={l.id} value={l.id}>{l.name}</option>
-              ))}
-            </select>
-          </label>
+          {!isSubtask && (
+            <label className="tk-field">
+              <span className="tk-field-label">Список</span>
+              <select className="tk-input" value={listId} onChange={e => setListId(Number(e.target.value))}>
+                {lists.map(l => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <div className="tk-field-row">
             <label className="tk-field">

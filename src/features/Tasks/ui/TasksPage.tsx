@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { Task, TaskInput, TaskList } from '../model/types'
-import { priorityMeta } from '../model/types'
+import { priorityMeta, MAX_TASK_DEPTH } from '../model/types'
 import {
   fetchLists, createList, updateList, deleteList,
   fetchTasks, createTask, updateTask, setTaskDone, deleteTask,
@@ -21,8 +21,14 @@ function fmtDate(iso: string): string {
   return `${d} ${MONTHS_SHORT[m - 1]}`
 }
 
-type TaskForm = { mode: 'add' } | { mode: 'edit'; task: Task } | null
+type TaskForm =
+  | { mode: 'add'; parentId?: number | null }
+  | { mode: 'edit'; task: Task }
+  | null
 type ListForm = { mode: 'add' } | { mode: 'edit'; list: TaskList } | null
+
+// узел дерева задач
+type TaskNode = Task & { children: TaskNode[]; depth: number }
 
 export function TasksPage() {
   const [lists, setLists] = useState<TaskList[]>([])
@@ -38,6 +44,15 @@ export function TasksPage() {
 
   const [taskForm, setTaskForm] = useState<TaskForm>(null)
   const [listForm, setListForm] = useState<ListForm>(null)
+  // свёрнутые задачи (по id) — их подзадачи скрыты
+  const [collapsed, setCollapsed] = useState<Set<number>>(new Set())
+
+  const toggleCollapse = (id: number) =>
+    setCollapsed(prev => {
+      const n = new Set(prev)
+      n.has(id) ? n.delete(id) : n.add(id)
+      return n
+    })
 
   const reloadLists = () => setListsTick(t => t + 1)
   const reloadTasks = () => setTasksTick(t => t + 1)
@@ -78,12 +93,42 @@ export function TasksPage() {
 
   const selectedList = lists.find(l => l.id === selectedId) ?? null
 
-  const sortedTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
-      if (a.done !== b.done) return a.done ? 1 : -1
-      return PRIO_ORDER[a.priority] - PRIO_ORDER[b.priority]
-    })
+  // строим дерево: корни (parentId == null) + вложенные подзадачи
+  const tree = useMemo(() => {
+    const byParent = new Map<number | null, Task[]>()
+    for (const t of tasks) {
+      const key = t.parentId ?? null
+      const arr = byParent.get(key)
+      if (arr) arr.push(t)
+      else byParent.set(key, [t])
+    }
+    const sortSiblings = (arr: Task[]) =>
+      [...arr].sort((a, b) => {
+        if (a.done !== b.done) return a.done ? 1 : -1
+        return PRIO_ORDER[a.priority] - PRIO_ORDER[b.priority]
+      })
+    const build = (parentId: number | null, depth: number): TaskNode[] =>
+      sortSiblings(byParent.get(parentId) ?? []).map(t => ({
+        ...t,
+        depth,
+        children: build(t.id, depth + 1),
+      }))
+    return build(null, 0)
   }, [tasks])
+
+  // все id потомков задачи (по текущему состоянию) — для рекурсивного закрытия
+  const descendantIds = (rootId: number): number[] => {
+    const out: number[] = []
+    let frontier = [rootId]
+    while (frontier.length) {
+      const kids = tasks.filter(t => t.parentId != null && frontier.includes(t.parentId))
+      if (!kids.length) break
+      const ids = kids.map(k => k.id)
+      out.push(...ids)
+      frontier = ids
+    }
+    return out
+  }
 
   const activeCount = tasks.filter(t => !t.done).length
 
@@ -118,21 +163,130 @@ export function TasksPage() {
   }
 
   async function toggleDone(task: Task) {
-    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, done: !t.done } : t))
+    const next = !task.done
+    // закрытие задачи рекурсивно закрывает подзадачи (как на бэкенде)
+    const affected = next ? new Set([task.id, ...descendantIds(task.id)]) : new Set([task.id])
+    setTasks(prev => prev.map(t => affected.has(t.id) ? { ...t, done: next } : t))
     try {
-      await setTaskDone(task.id, !task.done)
+      await setTaskDone(task.id, next)
     } catch {
       reloadTasks()
     }
   }
 
   async function handleDeleteTask(id: number) {
-    setTasks(prev => prev.filter(t => t.id !== id))
+    // на бэкенде удаляется всё поддерево — убираем потомков и локально
+    const remove = new Set([id, ...descendantIds(id)])
+    setTasks(prev => prev.filter(t => !remove.has(t.id)))
     try {
       await deleteTask(id)
     } catch {
       reloadTasks()
     }
+  }
+
+  function openSubtask(parentId: number) {
+    setCollapsed(prev => { const n = new Set(prev); n.delete(parentId); return n }) // раскрыть родителя
+    setTaskForm({ mode: 'add', parentId })
+  }
+
+  // рекурсивный рендер узла дерева с подзадачами
+  // коннекторы (├─ └─ │) рисуются целиком на CSS через ::before/::after у .tk-node
+  function renderNode(node: TaskNode) {
+    const prio = priorityMeta(node.priority)
+    const hasKids = node.children.length > 0
+    const isCollapsed = collapsed.has(node.id)
+    const canNest = node.depth < MAX_TASK_DEPTH
+    const openKids = hasKids ? node.children.filter(c => !c.done).length : 0
+
+    return (
+      <li
+        key={node.id}
+        className={`tk-node${node.depth === 0 ? ' tk-node--root' : ''}${hasKids ? ' tk-node--branch' : ''}`}
+      >
+        <div
+          className={`tk-task${node.done ? ' tk-task--done' : ''}`}
+          onClick={() => setTaskForm({ mode: 'edit', task: node })}
+        >
+          <button
+            className={`tk-twisty${hasKids ? '' : ' tk-twisty--empty'}`}
+            onClick={e => { e.stopPropagation(); if (hasKids) toggleCollapse(node.id) }}
+            title={hasKids ? (isCollapsed ? 'Развернуть' : 'Свернуть') : undefined}
+            aria-hidden={!hasKids}
+          >
+            {hasKids && (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'none', transition: 'transform 0.12s' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            )}
+          </button>
+
+          <button
+            className="tk-check"
+            onClick={e => { e.stopPropagation(); toggleDone(node) }}
+            style={node.done ? { background: prio.color, borderColor: prio.color } : { borderColor: prio.color }}
+            title={node.done ? 'Вернуть в работу' : 'Завершить'}
+          >
+            {node.done && (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+          </button>
+
+          <div className="tk-task-body">
+            <div className="tk-task-titlerow">
+              <span className="tk-task-title" title={node.title}>{node.title}</span>
+              <span className="tk-prio-badge" style={{ background: `${prio.color}1a`, color: prio.color }}>{prio.label}</span>
+              {hasKids && (
+                <span className="tk-subcount" title="Открытых подзадач">{openKids}/{node.children.length}</span>
+              )}
+            </div>
+            {node.description && <div className="tk-task-desc">{node.description}</div>}
+            {(node.dueDate || node.deadline) && (
+              <div className="tk-task-dates">
+                {node.dueDate && <span className="tk-date-badge">🗓 {fmtDate(node.dueDate)}</span>}
+                {node.deadline && <span className="tk-date-badge tk-date-badge--deadline">⏰ {fmtDate(node.deadline)}</span>}
+              </div>
+            )}
+          </div>
+
+          <div className="tk-task-actions">
+            {canNest && (
+              <button
+                className="tk-mini-btn"
+                title="Добавить подзадачу"
+                onClick={e => { e.stopPropagation(); openSubtask(node.id) }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            )}
+            <button
+              className="tk-mini-btn tk-mini-btn--danger"
+              title="Удалить"
+              onClick={e => { e.stopPropagation(); handleDeleteTask(node.id) }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {hasKids && !isCollapsed && (
+          <ul
+            className="tk-tasks tk-subtasks"
+            style={{ ['--rail' as string]: prio.color }}
+          >
+            {node.children.map(renderNode)}
+          </ul>
+        )}
+      </li>
+    )
   }
 
   return (
@@ -228,54 +382,7 @@ export function TasksPage() {
             </div>
           ) : (
             <ul className="tk-tasks">
-              {sortedTasks.map(t => {
-                const prio = priorityMeta(t.priority)
-                return (
-                  <li
-                    key={t.id}
-                    className={`tk-task${t.done ? ' tk-task--done' : ''}`}
-                    onClick={() => setTaskForm({ mode: 'edit', task: t })}
-                  >
-                    <button
-                      className="tk-check"
-                      onClick={e => { e.stopPropagation(); toggleDone(t) }}
-                      style={t.done ? { background: prio.color, borderColor: prio.color } : { borderColor: prio.color }}
-                      title={t.done ? 'Вернуть в работу' : 'Завершить'}
-                    >
-                      {t.done && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </button>
-
-                    <div className="tk-task-body">
-                      <div className="tk-task-titlerow">
-                        <span className="tk-task-title">{t.title}</span>
-                        <span className="tk-prio-badge" style={{ background: `${prio.color}1a`, color: prio.color }}>{prio.label}</span>
-                      </div>
-                      {t.description && <div className="tk-task-desc">{t.description}</div>}
-                      {(t.dueDate || t.deadline) && (
-                        <div className="tk-task-dates">
-                          {t.dueDate && <span className="tk-date-badge">🗓 {fmtDate(t.dueDate)}</span>}
-                          {t.deadline && <span className="tk-date-badge tk-date-badge--deadline">⏰ {fmtDate(t.deadline)}</span>}
-                        </div>
-                      )}
-                    </div>
-
-                    <button
-                      className="tk-mini-btn tk-mini-btn--danger"
-                      title="Удалить"
-                      onClick={e => { e.stopPropagation(); handleDeleteTask(t.id) }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                      </svg>
-                    </button>
-                  </li>
-                )
-              })}
+              {tree.map(n => renderNode(n))}
             </ul>
           )}
         </div>
@@ -284,10 +391,15 @@ export function TasksPage() {
       {/* ===== MODALS ===== */}
       {taskForm && selectedList && (
         <TaskFormModal
-          title={taskForm.mode === 'add' ? 'Новая задача' : 'Редактировать задачу'}
+          title={
+            taskForm.mode === 'edit'
+              ? 'Редактировать задачу'
+              : taskForm.parentId != null ? 'Новая подзадача' : 'Новая задача'
+          }
           lists={lists}
           defaultListId={selectedList.id}
           initial={taskForm.mode === 'edit' ? taskForm.task : undefined}
+          parentId={taskForm.mode === 'add' ? taskForm.parentId ?? null : null}
           onSave={handleSaveTask}
           onClose={() => setTaskForm(null)}
         />

@@ -203,26 +203,61 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
+}
+
+.dash-todo-list li {
+  flex: none;
+  overflow: hidden;
+}
+
+/* уход задачи после отсчёта */
+.dash-todo-leave {
+  animation: dashTodoLeave 0.32s ease forwards;
+}
+
+@keyframes dashTodoLeave {
+  from {
+    max-height: 46px;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateX(12px);
+  }
 }
 
 .dash-todo-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 8px 8px;
-  border: none;
+  gap: 6px;
   border-radius: 8px;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
   transition: background 0.12s;
 }
 
 .dash-todo-item:hover {
   background: #f6f7f9;
+}
+
+.dash-todo-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dash-todo-main:disabled {
+  cursor: default;
 }
 
 .dash-todo-check {
@@ -235,11 +270,13 @@
   align-items: center;
   justify-content: center;
   color: #fff;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .dash-todo-text {
   font-size: 14px;
   color: #2b2f33;
+  transition: color 0.2s;
 }
 
 .dash-todo-item--done .dash-todo-check {
@@ -250,6 +287,25 @@
 .dash-todo-item--done .dash-todo-text {
   color: #9aa0a6;
   text-decoration: line-through;
+}
+
+.dash-todo-undo {
+  flex: none;
+  margin-right: 6px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #1a73e8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.12s;
+}
+
+.dash-todo-undo:hover {
+  background: #e8f0fe;
 }
 
 /* ===== monthly semicircle donuts ===== */
