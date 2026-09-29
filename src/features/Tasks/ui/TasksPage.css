@@ -461,3 +461,47 @@
   background: #c4c7cc;
   cursor: not-allowed;
 }
+
+.tk-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.tk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tk-btn--ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tk-btn--ghost:disabled:hover {
+  background: none;
+}
+
+.tk-btn--active {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.tk-btn--active:hover {
+  background: #d9e6fd;
+}
+
+.tk-btn--ghost .tk-topbar-counter {
+  background: #eceff1;
+  color: #5f6368;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.tk-btn--active .tk-topbar-counter {
+  background: #fff;
+  color: #1a73e8;
+}

@@ -1,6 +1,6 @@
-# Calendar App
+# Productivity App
 
-React + TypeScript calendar frontend with time block management. Built with Feature-Sliced Design architecture.
+React + TypeScript personal productivity app built with Feature-Sliced Design. Combines a calendar with time blocks, task management, habit tracking, budgeting, and a FIRE capital planner.
 
 ## Links
 
@@ -36,6 +36,16 @@ docker-compose -f docker-compose-dev.yml --env-file .env.dev up
 
 Dev server runs on `0.0.0.0:5173` with hot reload and volume mount.
 
+### Local (without Docker)
+
+```bash
+npm install
+npm run dev       # Vite dev server
+npm run build     # TypeScript compile + Vite build
+npm run lint      # ESLint
+npm run preview   # Preview production build
+```
+
 ### Environment Variables
 
 | Variable | Description |
@@ -52,34 +62,53 @@ Ports must be available and match the backend `.env` configuration.
 
 ```
 src/
-├── app/          — Entry point, providers, config
-├── pages/        — Page layouts
-├── widgets/      — Calendar grids, header
-├── features/     — TimeBlock, Calendar navigation, current time indicator
+├── app/          — Entry point, providers (CalendarProvider), config, global types
+├── pages/        — Main page layout, section router
+├── widgets/      — Calendar grids, header/navigation
+├── features/     — Feature modules (see below)
 ├── entities/     — (reserved)
-└── shared/       — Date utilities
+└── shared/       — Shared UI (TrendChart) and libs (date utilities)
 ```
+
+The app renders one section at a time. The active section (`AppSection`) is held in `CalendarProvider` and routed by `MainPage`:
+`dashboard` (default) · `calendar` · `tasks` · `tracker` · `budget` · `capital`.
+
+### Feature Modules (`src/features/`)
+
+| Module | Description |
+|---|---|
+| `TimeBlock` | Time block CRUD, drag move/resize, layout engine, context menu |
+| `Calendar` | Calendar navigation (week/day views, period switching) |
+| `Tasks` | Task list with subtasks |
+| `HabitTracker` | Habit tracking |
+| `Budget` | Transactions, categories, CSV import, list/add modals |
+| `Capital` | FIRE planner — capital timeline, adjustments, projections |
+| `Dashboard` | Overview landing section |
+| `current-time-indicator` | Live current-time red line |
+
+Each feature follows the FSD layering: `model/` (types, logic), `ui/` (components), `storage/` or `api/` (data access), `lib/` (calculations).
 
 ### Key Patterns
 
 - **Repository Pattern** — `TimeBlockRepository` interface with `ApiRepository` implementation
 - **Controller Hook** — `useTimeBlocksController` manages state and CRUD operations
-- **Context Provider** — `CalendarProvider` for view state with localStorage persistence
+- **Context Provider** — `CalendarProvider` for global view/section state with localStorage persistence
 - **Custom Drag Hooks** — `useDragMove`, `useDragResize` with 15-minute snapping
 - **Layout Engine** — `calculateDayLayout` handles overlapping block positioning
+- **FIRE Projection** — `projectFire` computes financial-independence timeline from history/assumptions (`features/Capital/model/fire.ts`)
 
 ## Features
 
-- [x] Week view (7-day grid with time columns)
-- [x] Day view (single day, full width)
-- [x] Time block CRUD (create, read, update, delete)
-- [x] Drag to move blocks (within and between days)
-- [x] Drag to resize blocks (15-min snap)
-- [x] Context menu (edit title, copy, delete, 12-color picker)
+- [x] Week & day calendar views with time columns
+- [x] Time block CRUD, drag to move/resize (15-min snap), context menu (edit, copy, delete, color picker)
 - [x] Click on empty space to create block
 - [x] Current time indicator (live red line)
-- [x] Period navigation (prev/next, "Today" button)
-- [x] View & scroll position persistence (localStorage)
+- [x] Period navigation (prev/next, "Today"), view & scroll persistence (localStorage)
+- [x] Task list with subtasks
+- [x] Habit tracker
+- [x] Budget: transactions, categories, CSV import
+- [x] Capital / FIRE planner: timeline, adjustments, projections, trend charts
+- [x] Dashboard overview
 
 ## Planned
 

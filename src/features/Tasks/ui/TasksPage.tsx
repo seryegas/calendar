@@ -10,6 +10,7 @@ import { ListFormModal } from './ListFormModal'
 import './TasksPage.css'
 
 const LS_SELECTED = 'tasks_selected_list'
+const LS_HIDE_DONE = 'tasks_hide_done'
 
 const PRIO_ORDER: Record<string, number> = { urgent: 0, important: 1, current: 2 }
 
@@ -46,12 +47,21 @@ export function TasksPage() {
   const [listForm, setListForm] = useState<ListForm>(null)
   // свёрнутые задачи (по id) — их подзадачи скрыты
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set())
+  // скрывать решённые задачи
+  const [hideDone, setHideDone] = useState<boolean>(() => localStorage.getItem(LS_HIDE_DONE) === '1')
 
   const toggleCollapse = (id: number) =>
     setCollapsed(prev => {
       const n = new Set(prev)
       n.has(id) ? n.delete(id) : n.add(id)
       return n
+    })
+
+  const toggleHideDone = () =>
+    setHideDone(prev => {
+      const next = !prev
+      localStorage.setItem(LS_HIDE_DONE, next ? '1' : '0')
+      return next
     })
 
   const reloadLists = () => setListsTick(t => t + 1)
@@ -108,13 +118,15 @@ export function TasksPage() {
         return PRIO_ORDER[a.priority] - PRIO_ORDER[b.priority]
       })
     const build = (parentId: number | null, depth: number): TaskNode[] =>
-      sortSiblings(byParent.get(parentId) ?? []).map(t => ({
-        ...t,
-        depth,
-        children: build(t.id, depth + 1),
-      }))
+      sortSiblings(byParent.get(parentId) ?? [])
+        .filter(t => !hideDone || !t.done)
+        .map(t => ({
+          ...t,
+          depth,
+          children: build(t.id, depth + 1),
+        }))
     return build(null, 0)
-  }, [tasks])
+  }, [tasks, hideDone])
 
   // все id потомков задачи (по текущему состоянию) — для рекурсивного закрытия
   const descendantIds = (rootId: number): number[] => {
@@ -131,6 +143,7 @@ export function TasksPage() {
   }
 
   const activeCount = tasks.filter(t => !t.done).length
+  const doneCount = tasks.filter(t => t.done).length
 
   // ===== list mutations =====
   async function handleSaveList(name: string, color: string) {
@@ -350,13 +363,33 @@ export function TasksPage() {
               <span className="tk-topbar-name">Задачи</span>
             )}
           </div>
-          <button
-            className="tk-btn tk-btn--primary"
-            disabled={!selectedList}
-            onClick={() => setTaskForm({ mode: 'add' })}
-          >
-            + Добавить
-          </button>
+          <div className="tk-topbar-actions">
+            <button
+              className={`tk-btn tk-btn--ghost${hideDone ? ' tk-btn--active' : ''}`}
+              disabled={!selectedList || (doneCount === 0 && !hideDone)}
+              onClick={toggleHideDone}
+              title={hideDone ? 'Показать решённые' : 'Скрыть решённые'}
+            >
+              {hideDone ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              )}
+              {hideDone ? 'Показать решённые' : 'Скрыть решённые'}
+              {doneCount > 0 && <span className="tk-topbar-counter">{doneCount}</span>}
+            </button>
+            <button
+              className="tk-btn tk-btn--primary"
+              disabled={!selectedList}
+              onClick={() => setTaskForm({ mode: 'add' })}
+            >
+              + Добавить
+            </button>
+          </div>
         </div>
 
         <div className="tk-content">
@@ -379,6 +412,12 @@ export function TasksPage() {
               <div className="tk-empty-title">Задач пока нет</div>
               <div className="tk-empty-sub">Добавьте первую задачу в этот список.</div>
               <button className="tk-btn tk-btn--primary" onClick={() => setTaskForm({ mode: 'add' })}>+ Добавить</button>
+            </div>
+          ) : tree.length === 0 ? (
+            <div className="tk-empty">
+              <div className="tk-empty-title">Все задачи решены</div>
+              <div className="tk-empty-sub">Решённые задачи скрыты.</div>
+              <button className="tk-btn tk-btn--ghost" onClick={toggleHideDone}>Показать решённые</button>
             </div>
           ) : (
             <ul className="tk-tasks">
