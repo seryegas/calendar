@@ -678,3 +678,130 @@ tbody tr:hover .bg-row-td {
 .bg-foot-td--grand {
   color: #1a73e8;
 }
+
+/* ===== Полоса целесообразности расходов ===== */
+.bg-nec {
+  margin: 4px 0 8px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+}
+
+.bg-nec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.bg-nec-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.bg-nec-excess {
+  font-size: 13px;
+  color: #ea4335;
+}
+
+.bg-nec-excess-pct {
+  color: #d93025;
+  opacity: 0.85;
+}
+
+.bg-nec-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f1f3f4;
+}
+
+.bg-nec-bar-seg {
+  height: 100%;
+  transition: width 0.2s;
+}
+
+.bg-nec-bar-seg--unset {
+  background: repeating-linear-gradient(45deg, #dadce0, #dadce0 4px, #e8eaed 4px, #e8eaed 8px);
+}
+
+.bg-nec-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+}
+
+.bg-nec-leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #3c4043;
+}
+
+.bg-nec-leg--muted {
+  color: #80868b;
+}
+
+.bg-nec-leg-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bg-nec-leg-dot--unset {
+  background: repeating-linear-gradient(45deg, #dadce0, #dadce0 2px, #f1f3f4 2px, #f1f3f4 4px);
+}
+
+.bg-nec-leg-val {
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-nec-leg-pct {
+  color: #80868b;
+  font-size: 11px;
+}
+
+.bg-nec-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #80868b;
+}
+
+/* ===== CHART (доход/расход по периодам) ===== */
+.bg-chart-wrap {
+  margin: 14px 0 4px;
+  padding: 10px 8px 4px;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* вариант графика: колонны / линия (как в Капитале) */
+.bg-var-switch {
+  display: inline-flex;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.bg-var-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border: none;
+  background: #fff;
+  color: #80868b;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.bg-var-btn + .bg-var-btn { border-left: 1px solid #dadce0; }
+.bg-var-btn:hover { background: #f8f9fa; color: #3c4043; }
+.bg-var-btn--active { background: #fff3e0; color: #ef6c00; }

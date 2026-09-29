@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
+import { TrendChart, type TrendVariant } from '../../../shared/ui/TrendChart/TrendChart'
 import type { BudgetMode, BudgetKind, BudgetCategory } from '../model/types'
-import { categoriesOf, MONTH_LABELS } from '../model/types'
+import { categoriesOf, MONTH_LABELS, NECESSITY_META } from '../model/types'
 import type { NewTransaction } from '../model/transaction'
 import type { BudgetSummary } from '../storage/budgetApi'
 import {
@@ -27,6 +28,8 @@ const LS_MODE = 'budget_mode'
 const LS_YEAR = 'budget_year'
 const LS_MONTH = 'budget_month'
 const LS_KIND = 'budget_kind'
+const LS_VIEW = 'budget_view'          // table | chart
+const LS_CHART_VAR = 'budget_chart_var' // bars | line
 
 function restoreMode(): BudgetMode {
   const raw = localStorage.getItem(LS_MODE)
@@ -75,6 +78,10 @@ export function BudgetPage() {
   const [selectedYear, setYearState] = useState<number>(restoreYear)
   const [selectedMonth, setMonthState] = useState<number>(restoreMonth)
   const [breakdownOpen, setBreakdownOpen] = useState(false)
+  const [chartView, setChartView] = useState(() => localStorage.getItem(LS_VIEW) === 'chart')
+  const [chartVar, setChartVarState] = useState<TrendVariant>(
+    () => (localStorage.getItem(LS_CHART_VAR) as TrendVariant) || 'bars',
+  )
 
   const [summary, setSummary] = useState<BudgetSummary | null>(null)
   const [error, setError] = useState('')
@@ -122,6 +129,14 @@ export function BudgetPage() {
     setMonthState(m)
     localStorage.setItem(LS_MONTH, String(m))
   }
+  function setView(chart: boolean) {
+    setChartView(chart)
+    localStorage.setItem(LS_VIEW, chart ? 'chart' : 'table')
+  }
+  function setChartVar(v: TrendVariant) {
+    setChartVarState(v)
+    localStorage.setItem(LS_CHART_VAR, v)
+  }
 
   // ===== мутации (через API), затем перезагрузка агрегатов =====
   async function handleAdd(tx: NewTransaction) {
@@ -158,6 +173,24 @@ export function BudgetPage() {
   const periodIncome = summary?.totals?.income ?? 0
   const periodExpense = summary?.totals?.expense ?? 0
   const balance = summary?.totals?.balance ?? 0
+
+  const necExpense = summary?.necessityTotals?.expense ?? {}
+
+  // данные графика доход/расход по периодам (дни месяца или месяцы года)
+  const chartData = useMemo(() => {
+    const incomeCats = categoriesOf('income')
+    const expenseCats = categoriesOf('expense')
+    const periods =
+      mode === 'month'
+        ? Array.from({ length: new Date(selectedYear, selectedMonth, 0).getDate() }, (_, i) => i + 1)
+        : Array.from({ length: 12 }, (_, i) => i + 1)
+    const labels = periods.map(p =>
+      mode === 'month' ? String(p) : MONTH_LABELS[p - 1].slice(0, 3),
+    )
+    const income = periods.map(p => incomeCats.reduce((s, c) => s + cellVal('income', p, c.id), 0))
+    const expense = periods.map(p => expenseCats.reduce((s, c) => s + cellVal('expense', p, c.id), 0))
+    return { labels, income, expense }
+  }, [summary, mode, selectedYear, selectedMonth])
 
   const title =
     mode === 'month'
@@ -271,6 +304,42 @@ export function BudgetPage() {
                 Год
               </button>
             </div>
+            <div className="bg-mode-switch">
+              <button
+                className={`bg-mode-btn${!chartView ? ' bg-mode-btn--active' : ''}`}
+                onClick={() => setView(false)}
+              >
+                Таблица
+              </button>
+              <button
+                className={`bg-mode-btn${chartView ? ' bg-mode-btn--active' : ''}`}
+                onClick={() => setView(true)}
+              >
+                График
+              </button>
+            </div>
+            {chartView && (
+              <div className="bg-var-switch">
+                <button
+                  className={`bg-var-btn${chartVar === 'bars' ? ' bg-var-btn--active' : ''}`}
+                  onClick={() => setChartVar('bars')}
+                  title="Колонны"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="6" y1="20" x2="6" y2="12" /><line x1="12" y1="20" x2="12" y2="6" /><line x1="18" y1="20" x2="18" y2="10" />
+                  </svg>
+                </button>
+                <button
+                  className={`bg-var-btn${chartVar === 'line' ? ' bg-var-btn--active' : ''}`}
+                  onClick={() => setChartVar('line')}
+                  title="Линия"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 16 9 10 13 14 21 5" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -298,6 +367,9 @@ export function BudgetPage() {
             <span className="bg-sum-value">{fmtSigned(balance)}</span>
           </button>
         </div>
+
+        {/* ===== ЦЕЛЕСООБРАЗНОСТЬ РАСХОДОВ ===== */}
+        {!isEmpty && periodExpense > 0 && <NecessityBar totals={necExpense} expense={periodExpense} />}
 
         {/* ===== BREAKDOWN (пончики) ===== */}
         {breakdownOpen && (
@@ -344,6 +416,19 @@ export function BudgetPage() {
               <button className="bg-btn bg-btn--primary" onClick={() => setAddOpen(true)}>+ Добавить</button>
               <button className="bg-btn bg-btn--ghost" onClick={() => setImportOpen(true)}>Импорт CSV</button>
             </div>
+          </div>
+        ) : chartView ? (
+          <div className="bg-chart-wrap">
+            <TrendChart
+              labels={chartData.labels}
+              series={[
+                kind === 'income'
+                  ? { name: 'Доход', color: '#2e7d32', values: chartData.income }
+                  : { name: 'Расход', color: '#ef6c00', values: chartData.expense },
+              ]}
+              variant={chartVar}
+              formatValue={fmtSigned}
+            />
           </div>
         ) : (
           <div className="bg-table-wrap">
@@ -433,6 +518,76 @@ interface DrillState {
   categoryId: number
   filter: TxFilter
   defaultDate: string
+}
+
+function NecessityBar({
+  totals,
+  expense,
+}: {
+  totals: Record<string, number>
+  expense: number
+}) {
+  const segs = NECESSITY_META
+    .map(m => ({ m, v: totals[m.key] ?? 0 }))
+    .filter(s => s.v > 0)
+  const unset = totals['unset'] ?? 0
+  const marked = expense - unset
+
+  // акцент: лишнее
+  const excess = totals['excess'] ?? 0
+
+  return (
+    <div className="bg-nec">
+      <div className="bg-nec-head">
+        <span className="bg-nec-title">Целесообразность расходов</span>
+        {excess > 0 && (
+          <span className="bg-nec-excess">
+            Лишнее: <b>{RUB.format(excess)}</b>
+            <span className="bg-nec-excess-pct"> · {Math.round((excess / expense) * 100)}%</span>
+          </span>
+        )}
+      </div>
+
+      <div className="bg-nec-bar">
+        {segs.map(s => (
+          <div
+            key={s.m.key}
+            className="bg-nec-bar-seg"
+            style={{ width: `${(s.v / expense) * 100}%`, background: s.m.color }}
+            title={`${s.m.label}: ${RUB.format(s.v)}`}
+          />
+        ))}
+        {unset > 0 && (
+          <div
+            className="bg-nec-bar-seg bg-nec-bar-seg--unset"
+            style={{ width: `${(unset / expense) * 100}%` }}
+            title={`Не размечено: ${RUB.format(unset)}`}
+          />
+        )}
+      </div>
+
+      <div className="bg-nec-legend">
+        {segs.map(s => (
+          <span key={s.m.key} className="bg-nec-leg">
+            <span className="bg-nec-leg-dot" style={{ background: s.m.color }} />
+            {s.m.label}
+            <b className="bg-nec-leg-val">{RUB.format(s.v)}</b>
+            <span className="bg-nec-leg-pct">{Math.round((s.v / expense) * 100)}%</span>
+          </span>
+        ))}
+        {unset > 0 && (
+          <span className="bg-nec-leg bg-nec-leg--muted">
+            <span className="bg-nec-leg-dot bg-nec-leg-dot--unset" />
+            Не размечено
+            <b className="bg-nec-leg-val">{RUB.format(unset)}</b>
+          </span>
+        )}
+      </div>
+      {marked === 0 && (
+        <div className="bg-nec-hint">Отметьте траты в списке операций (клик по ячейке), чтобы увидеть разбор.</div>
+      )}
+    </div>
+  )
 }
 
 function Donut({

@@ -1,4 +1,4 @@
-import type { BudgetKind } from './types'
+import type { BudgetKind, Necessity } from './types'
 
 export interface Transaction {
   id: number          // id операции (с бэкенда)
@@ -9,6 +9,7 @@ export interface Transaction {
   note?: string
   source: string      // 'manual' | 'tbank' | 'sber' | 'demo' | ...
   extId?: string      // id операции банка → для дедупликации
+  necessity?: Necessity  // целесообразность; undefined = не размечено
 }
 
 /** Новая операция без id (id присваивает бэкенд) */

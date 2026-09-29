@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   frontend:
+    image: calendar-frontend-dev:latest   # свой тег, чтобы dev-сборка не перезатирала prod-образ calendar-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile.dev

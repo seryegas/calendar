@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import type { BudgetKind } from '../model/types'
-import { categoriesOf } from '../model/types'
+import type { BudgetKind, Necessity } from '../model/types'
+import { categoriesOf, NECESSITY_META } from '../model/types'
 import type { NewTransaction } from '../model/transaction'
 import './modals.css'
 
@@ -24,6 +24,7 @@ export function AddTransactionModal({
   const [categoryId, setCategoryId] = useState(cats[0].id)
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
+  const [necessity, setNecessity] = useState<Necessity | undefined>(undefined)
 
   const amountNum = parseFloat(amount.replace(',', '.'))
   const valid = date && categoryId && amountNum > 0
@@ -42,6 +43,7 @@ export function AddTransactionModal({
       amount: Math.round(amountNum * 100) / 100,
       note: note.trim() || undefined,
       source: 'manual',
+      necessity: kind === 'expense' ? necessity : undefined,
     })
     onClose()
   }
@@ -108,6 +110,25 @@ export function AddTransactionModal({
               placeholder="необязательно"
             />
           </label>
+
+          {kind === 'expense' && (
+            <label className="bg-field">
+              <span className="bg-field-label">Целесообразность</span>
+              <div className="bg-nec-select">
+                {NECESSITY_META.map(m => (
+                  <button
+                    key={m.key}
+                    type="button"
+                    className={`bg-nec-opt${necessity === m.key ? ' bg-nec-opt--on' : ''}`}
+                    style={necessity === m.key ? { background: m.color, borderColor: m.color, color: '#fff' } : { color: m.color }}
+                    onClick={() => setNecessity(necessity === m.key ? undefined : m.key)}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </label>
+          )}
         </div>
 
         <div className="bg-modal-foot">

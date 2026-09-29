@@ -1,5 +1,5 @@
 import type { NewTransaction, Transaction } from '../model/transaction'
-import type { BudgetKind, BudgetMode } from '../model/types'
+import type { BudgetKind, BudgetMode, Necessity } from '../model/types'
 
 const HOST = import.meta.env.VITE_HOST || ''
 const PORT = import.meta.env.VITE_PORT || ''
@@ -15,6 +15,8 @@ export interface BudgetSummary {
   // cells[kind][period][categoryId] = сумма; period = день (month) или месяц (year)
   cells: Record<BudgetKind, Record<number, Record<number, number>>>
   categoryTotals: Record<BudgetKind, Record<number, number>>
+  // necessityTotals[kind][necessity | 'unset'] = сумма
+  necessityTotals?: Record<BudgetKind, Record<string, number>>
   totals: { income: number; expense: number; balance: number }
 }
 
@@ -27,6 +29,7 @@ function toPayload(t: NewTransaction) {
     date: t.date,
     source: t.source,
     extId: t.extId,
+    necessity: t.necessity,
   }
 }
 
@@ -39,6 +42,48 @@ export async function fetchSummary(
   const res = await fetch(`${API_URL}/summary?${q}`)
   if (!res.ok) throw new Error('summary failed')
   return res.json()
+}
+
+// ===== помесячная серия доход/расход за диапазон (для FIRE-прогноза) =====
+
+export interface MonthlySeries {
+  months: string[]    // 'YYYY-MM'
+  income: number[]
+  expense: number[]
+}
+
+function sumCells(rec?: Record<number, number>): number {
+  return rec ? Object.values(rec).reduce((a, b) => a + b, 0) : 0
+}
+
+// Fallback без спец-эндпоинта: собираем помесячно из годовых сводок
+async function monthlySeriesFallback(from: string, to: string): Promise<MonthlySeries> {
+  const [fy, fm] = from.split('-').map(Number)
+  const [ty, tm] = to.split('-').map(Number)
+  const months: string[] = []
+  const income: number[] = []
+  const expense: number[] = []
+  for (let y = fy; y <= ty; y++) {
+    const s = await fetchSummary('year', y, 1)
+    const startM = y === fy ? fm : 1
+    const endM = y === ty ? tm : 12
+    for (let m = startM; m <= endM; m++) {
+      months.push(`${y}-${String(m).padStart(2, '0')}`)
+      income.push(sumCells(s.cells.income?.[m]))
+      expense.push(sumCells(s.cells.expense?.[m]))
+    }
+  }
+  return { months, income, expense }
+}
+
+// GET /budget-transactions/monthly-series?from=YYYY-MM&to=YYYY-MM
+// При отсутствии эндпоинта (404) — падаем на fallback по годовым сводкам.
+export async function fetchMonthlySeries(from: string, to: string): Promise<MonthlySeries> {
+  const q = new URLSearchParams({ from, to })
+  const res = await fetch(`${API_URL}/monthly-series?${q}`)
+  if (res.ok) return res.json()
+  if (res.status === 404) return monthlySeriesFallback(from, to)
+  throw new Error('monthly-series failed')
 }
 
 export async function createTransaction(tx: NewTransaction): Promise<void> {
@@ -86,6 +131,7 @@ function fromDoc(d: any): Transaction {
     note: d.description || undefined,
     source: d.source,
     extId: d.extId,
+    necessity: d.necessity || undefined,
   }
 }
 
@@ -112,4 +158,18 @@ export async function updateTransaction(id: number, tx: NewTransaction): Promise
 
 export async function deleteTransaction(id: number): Promise<void> {
   await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+}
+
+// Точечная установка/снятие целесообразности (клик по плашке в списке)
+export async function setNecessity(
+  id: number,
+  necessity: Necessity | null,
+): Promise<Transaction> {
+  const res = await fetch(`${API_URL}/${id}/necessity`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ necessity }),
+  })
+  if (!res.ok) throw new Error('necessity failed')
+  return fromDoc(await res.json())
 }

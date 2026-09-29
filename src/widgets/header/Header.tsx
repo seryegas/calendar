@@ -46,6 +46,16 @@ const SECTIONS: { id: AppSection; name: string; icon: JSX.Element; disabled?: bo
     ),
   },
   {
+    id: 'capital',
+    name: 'Капитал',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="3 17 9 11 13 15 21 7"/>
+        <polyline points="15 7 21 7 21 13"/>
+      </svg>
+    ),
+  },
+  {
     id: 'tracker',
     name: 'Трекер',
     icon: (

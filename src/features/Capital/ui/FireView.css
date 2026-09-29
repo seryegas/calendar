@@ -1,0 +1,172 @@
+.fire {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== карточки ===== */
+
+.fire-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.fire-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.fire-card--accent {
+  background: #e6f4ea;
+  border-color: #ceead6;
+}
+
+.fire-card-label {
+  font-size: 12px;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.fire-card-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #202124;
+}
+
+.fire-card--accent .fire-card-value { color: #188038; }
+
+.fire-card-sub {
+  font-size: 12px;
+  color: #80868b;
+}
+
+/* ===== допущения ===== */
+
+.fire-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 22px;
+  padding: 16px 18px;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.fire-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 160px;
+}
+
+.fire-field-label {
+  font-size: 12px;
+  color: #5f6368;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fire-field-label b {
+  color: #202124;
+  font-weight: 700;
+}
+
+.fire-slider {
+  width: 100%;
+  accent-color: #188038;
+  cursor: pointer;
+}
+
+.fire-num {
+  padding: 8px 10px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #202124;
+  background: #fff;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.fire-num:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+}
+
+.fire-reset {
+  padding: 9px 14px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  height: fit-content;
+}
+
+.fire-reset:hover { background: #f1f3f4; border-color: #bdc1c6; }
+
+/* ===== графики ===== */
+
+.fire-chart-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fire-chart-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fire-chart-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #202124;
+}
+
+.fire-chart-hint {
+  font-size: 12px;
+  color: #80868b;
+}
+
+.fire-chart-box {
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  padding: 10px 8px 4px;
+  background: #fff;
+}
+
+/* ===== empty / loading ===== */
+
+.fire-empty {
+  margin: 40px auto;
+  text-align: center;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+}
+
+.fire-empty-title { font-size: 16px; font-weight: 600; color: #202124; }
+.fire-empty-sub { font-size: 13px; color: #5f6368; line-height: 1.5; }
+
+@media (max-width: 720px) {
+  .fire-cards { grid-template-columns: repeat(2, 1fr); }
+}

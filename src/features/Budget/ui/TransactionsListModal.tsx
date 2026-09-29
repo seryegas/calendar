@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, type KeyboardEvent } from 'react'
-import type { BudgetKind } from '../model/types'
+import type { BudgetKind, Necessity } from '../model/types'
+import { NECESSITY_META } from '../model/types'
 import type { Transaction } from '../model/transaction'
 import type { TxFilter } from '../storage/budgetApi'
 import {
@@ -7,6 +8,7 @@ import {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  setNecessity as setNecessityApi,
 } from '../storage/budgetApi'
 import './modals.css'
 
@@ -20,6 +22,7 @@ interface Draft {
   date: string
   amount: string
   note: string
+  necessity?: Necessity
 }
 
 export function TransactionsListModal({
@@ -43,6 +46,7 @@ export function TransactionsListModal({
   const [loading, setLoading] = useState(true)
   const [editId, setEditId] = useState<number | 'new' | null>(null)
   const [draft, setDraft] = useState<Draft>({ date: defaultDate, amount: '', note: '' })
+  const showNec = kind === 'expense'
 
   const load = useCallback(() => {
     setLoading(true)
@@ -59,11 +63,11 @@ export function TransactionsListModal({
 
   function startEdit(t: Transaction) {
     setEditId(t.id)
-    setDraft({ date: t.date, amount: String(t.amount), note: t.note ?? '' })
+    setDraft({ date: t.date, amount: String(t.amount), note: t.note ?? '', necessity: t.necessity })
   }
   function startAdd() {
     setEditId('new')
-    setDraft({ date: defaultDate, amount: '', note: '' })
+    setDraft({ date: defaultDate, amount: '', note: '', necessity: undefined })
   }
 
   const amountNum = parseFloat(draft.amount.replace(',', '.'))
@@ -78,12 +82,26 @@ export function TransactionsListModal({
       note: draft.note.trim() || undefined,
       date: draft.date,
       source: 'manual',
+      necessity: showNec ? draft.necessity : undefined,
     }
     if (editId === 'new') await createTransaction(payload)
     else if (typeof editId === 'number') await updateTransaction(editId, payload)
     setEditId(null)
     load()
     onChanged()
+  }
+
+  // клик по плашке в списке: точечная установка/снятие целесообразности
+  async function changeNecessity(t: Transaction, next: Necessity | undefined) {
+    const value = t.necessity === next ? undefined : next
+    // оптимистично обновляем строку
+    setItems(prev => prev.map(x => (x.id === t.id ? { ...x, necessity: value } : x)))
+    try {
+      await setNecessityApi(t.id, value ?? null)
+      onChanged()
+    } catch {
+      load() // откат к серверному состоянию
+    }
   }
 
   async function remove(id: number) {
@@ -120,6 +138,7 @@ export function TransactionsListModal({
                   draft={draft}
                   setDraft={setDraft}
                   valid={draftValid}
+                  showNec={showNec}
                   onSave={saveDraft}
                   onCancel={() => setEditId(null)}
                 />
@@ -136,13 +155,37 @@ export function TransactionsListModal({
                     draft={draft}
                     setDraft={setDraft}
                     valid={draftValid}
+                    showNec={showNec}
                     onSave={saveDraft}
                     onCancel={() => setEditId(null)}
                   />
                 ) : (
                   <div key={t.id} className="bg-list-row">
                     <span className="bg-list-date">{fmtDate(t.date)}</span>
-                    <span className="bg-list-note">{t.note || '—'}</span>
+                    <span className="bg-list-note">
+                      <span className="bg-list-note-text">{t.note || '—'}</span>
+                      {showNec && (
+                        <span className="bg-nec-pick">
+                          {NECESSITY_META.map(m => {
+                            const on = t.necessity === m.key
+                            return (
+                              <button
+                                key={m.key}
+                                type="button"
+                                title={m.label}
+                                className={`bg-nec-dot${on ? ' bg-nec-dot--on' : ''}`}
+                                style={on
+                                  ? { background: m.color, borderColor: m.color, color: '#fff' }
+                                  : { color: m.color, borderColor: m.color }}
+                                onClick={() => changeNecessity(t, m.key)}
+                              >
+                                {on ? m.label : ''}
+                              </button>
+                            )
+                          })}
+                        </span>
+                      )}
+                    </span>
                     <span className="bg-list-amount">{RUB.format(t.amount)}</span>
                     <span className="bg-list-actions">
                       <button className="bg-icon-btn" title="Изменить" onClick={() => startEdit(t)}>✎</button>
@@ -167,12 +210,14 @@ function EditRow({
   draft,
   setDraft,
   valid,
+  showNec,
   onSave,
   onCancel,
 }: {
   draft: Draft
   setDraft: (d: Draft) => void
   valid: boolean
+  showNec: boolean
   onSave: () => void
   onCancel: () => void
 }) {
@@ -211,6 +256,21 @@ function EditRow({
         <button className="bg-icon-btn bg-icon-btn--ok" title="Сохранить" onClick={onSave} disabled={!valid}>✓</button>
         <button className="bg-icon-btn" title="Отмена" onClick={onCancel}>×</button>
       </span>
+      {showNec && (
+        <div className="bg-nec-select bg-nec-select--edit">
+          {NECESSITY_META.map(m => (
+            <button
+              key={m.key}
+              type="button"
+              className={`bg-nec-opt${draft.necessity === m.key ? ' bg-nec-opt--on' : ''}`}
+              style={draft.necessity === m.key ? { background: m.color, borderColor: m.color, color: '#fff' } : { color: m.color }}
+              onClick={() => setDraft({ ...draft, necessity: draft.necessity === m.key ? undefined : m.key })}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

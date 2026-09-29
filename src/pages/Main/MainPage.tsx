@@ -2,6 +2,7 @@ import { Header } from "../../widgets/header/Header.tsx"
 import { Calendar } from "../../widgets/calendar/Calendar.tsx"
 import { HabitTrackerPage } from "../../features/HabitTracker"
 import { BudgetPage } from "../../features/Budget"
+import { CapitalPage } from "../../features/Capital"
 import { TasksPage } from "../../features/Tasks"
 import { DashboardPage } from "../../features/Dashboard"
 import { useApp } from "../../app/providers/CalendarProvider.tsx"
@@ -11,6 +12,7 @@ function renderSection(section: AppSection) {
     switch (section) {
         case 'tracker':  return <HabitTrackerPage />
         case 'budget':   return <BudgetPage />
+        case 'capital':  return <CapitalPage />
         case 'tasks':    return <TasksPage />
         case 'calendar': return <Calendar />
         case 'dashboard':
